@@ -37,7 +37,7 @@ typedef enum
 	COMMENT, COMMENTERR,
 	/* special symbols */
 	ASSIGN, EQ, LT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI,
-	LE, GT, GE, LQBRACE, RQBRACE, LSBRACE, RSBRACE, COMMA
+	SAME, DIFF, LE, GT, GE, LQBRACE, RQBRACE, LSBRACE, RSBRACE, COMMA
 }TokenType;
 
 extern FILE* source; /* source code text file */

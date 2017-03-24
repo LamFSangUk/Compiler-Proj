@@ -35,6 +35,8 @@ whitespace  [ \t]+
 "while"			{return WHILE;}
 "return"		{return RETURN;}
 ":="            {return ASSIGN;}
+"=="			{return SAME;}
+"!="			{return DIFF;}
 "="             {return EQ;}
 "<"             {return LT;}
 "<="			{return LE;}
