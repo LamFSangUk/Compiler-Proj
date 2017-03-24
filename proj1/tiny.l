@@ -34,6 +34,7 @@ whitespace  [ \t]+
 "int"			{return INT;}
 "while"			{return WHILE;}
 "return"		{return RETURN;}
+"void"			{return VOID;}
 ":="            {return ASSIGN;}
 "=="			{return SAME;}
 "!="			{return DIFF;}

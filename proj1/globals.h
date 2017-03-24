@@ -31,7 +31,7 @@ typedef enum
 	{ENDFILE, ERROR,
 	/* reserved words */
 	IF, THEN, ELSE, END, REPEAT, UNTIL, READ, WRITE, 
-	INT, WHILE, RETURN,
+	INT, WHILE, RETURN, VOID,
 	/* multicharacter tokens */
 	ID, NUM,
 	COMMENT, COMMENTERR,

@@ -28,6 +28,7 @@ void printToken(TokenType token, const char* tokenString)
 	case INT: 		fprintf(listing,"INT\t\t\t%s\n",tokenString); break;
 	case WHILE: 	fprintf(listing,"WHILE\t\t\t%s\n",tokenString); break;
 	case RETURN: 	fprintf(listing,"RETURN\t\t\t%s\n",tokenString); break;
+	case VOID: 		fprintf(listing,"VOID\t\t\t%s\n",tokenString); break;
 	case ASSIGN: 	fprintf(listing,":=\t\t\t:=\n"); break;	
 	case SAME: 		fprintf(listing,"==\t\t\t==\n"); break;
 	case DIFF: 		fprintf(listing,"!=\t\t\t!=\n"); break;
