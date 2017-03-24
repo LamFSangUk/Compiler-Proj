@@ -6,9 +6,9 @@ TARGET = 20141522
 all : $(TARGET)
 
 $(TARGET) : $(OBJECTS)
-			$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) -lfl
+			$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) -ll
 
-main.o : main.c globals.h util.h scan.h parse.h analyze.h cgen.h
+main.o : main.c globals.h util.h scan.h
 			$(CC) $(CFLAGS) -c main.c
 
 util.o : util.c util.h globals.h
