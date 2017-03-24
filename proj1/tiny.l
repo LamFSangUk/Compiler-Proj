@@ -86,7 +86,7 @@ TokenType getToken(void)
   currentToken = yylex();
   strncpy(tokenString,yytext,MAXTOKENLEN);
   if (TraceScan) {
-    if(currentToken!=COMMENT) fprintf(listing,"\t%d: ",lineno);
+    if(currentToken!=COMMENT) fprintf(listing,"\t%d\t\t ",lineno);
     printToken(currentToken,tokenString);
   }
   return currentToken;

@@ -70,6 +70,8 @@ main(int argc, char * argv[])
 	listing = stdout; /*send listing to screen */
 	fprintf(listing, "\nTINY COMPILATION: %s\n", pgm);
 #if NO_PARSE
+	fprintf(listing,"    line number\t\ttoken\t\t\tlexeme\n");
+	fprintf(listing,"---------------------------------------------------------\n");
 	while (getToken() != ENDFILE);
 #else
 	syntaxTree = parse();
