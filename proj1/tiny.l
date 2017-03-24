@@ -56,12 +56,17 @@ whitespace  [ \t]+
 {identifier}    {return ID;}
 {newline}       {lineno++;}
 {whitespace}    {/* skip whitespace */}
-"{"             { char c;
-                  do
-                  { c = input();
-                    if (c == EOF) break;
-                    if (c == '\n') lineno++;
-                  } while (c != '}');
+"/*"            { char c;
+				  char flag=FALSE;
+                  while(c!=EOF){
+					c=input();
+					if(c=='\n') lineno++;
+					if(c=='/' && flag)
+						return COMMENT;
+					else if(c=='*') flag=TRUE;
+					else flag=FALSE;
+				  }
+				  return COMMENTERR;
                 }
 .               {return ERROR;}
 
@@ -79,7 +84,7 @@ TokenType getToken(void)
   currentToken = yylex();
   strncpy(tokenString,yytext,MAXTOKENLEN);
   if (TraceScan) {
-    fprintf(listing,"\t%d: ",lineno);
+    if(currentToken!=COMMENT) fprintf(listing,"\t%d: ",lineno);
     printToken(currentToken,tokenString);
   }
   return currentToken;

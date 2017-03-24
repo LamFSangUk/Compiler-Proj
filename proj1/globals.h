@@ -34,6 +34,7 @@ typedef enum
 	INT, WHILE, RETURN,
 	/* multicharacter tokens */
 	ID, NUM,
+	COMMENT, COMMENTERR,
 	/* special symbols */
 	ASSIGN, EQ, LT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI,
 	LE, GT, GE, LQBRACE, RQBRACE, LSBRACE, RSBRACE, COMMA
@@ -58,7 +59,7 @@ typedef enum {Void, Integer, Boolean} ExpType;
 
 #define MAXCHILDREN 3
 
-typedef struct treeMode
+typedef struct treeNode
 {
 	struct treeNode * child[MAXCHILDREN];
 	struct treeNode * sibling;

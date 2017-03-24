@@ -17,40 +17,50 @@ void printToken(TokenType token, const char* tokenString)
 {
 	switch(token)
 	{
-	case IF:
-	case THEN:
-	case ELSE:
-	case END:
-	case REPEAT:
-	case UNTIL:
-	case READ:
-	case WRITE:
-		fprintf(listing, 
-			"reserved word: %s\n",tokenString);
-		break;
-	case ASSIGN: fprintf(listing,":=\n"); break;
-	case LT: fprintf(listing,"<\n"); break;
-	case EQ: fprintf(listing,"=\n"); break;
-	case LPAREN: fprintf(listing,"(\n"); break;
-	case RPAREN: fprintf(listing,")\n"); break;
-	case SEMI: fprintf(listing,";\n"); break;
-	case PLUS: fprintf(listing,"+\n"); break;
-	case MINUS: fprintf(listing,"-\n"); break;
-	case TIMES: fprintf(listing,"*\n"); break;
-	case OVER: fprintf(listing,"/\n"); break;
+	case IF: fprintf(listing,"IF\t\t\t%s\n",tokenString); break;
+	case THEN: fprintf(listing,"THEN\t\t\t%s\n",tokenString); break;
+	case ELSE: fprintf(listing,"ELSE\t\t\t%s\n",tokenString); break;
+	case END: fprintf(listing,"END\t\t\t%s\n",tokenString); break;
+	case REPEAT: fprintf(listing,"REPEAT\t\t%s\n",tokenString); break;
+	case UNTIL: fprintf(listing,"UNTIL\t\t%s\n",tokenString); break;
+	case READ: fprintf(listing,"READ\t\t\t%s\n",tokenString); break;
+	case WRITE: fprintf(listing,"WRITE\t\t%s\n",tokenString); break;	
+	case INT: fprintf(listing,"INT\t\t\t%s\n",tokenString); break;
+	case WHILE: fprintf(listing,"WHILE\t\t%s\n",tokenString); break;
+	case RETURN: fprintf(listing,"RETURN\t\t%s\n",tokenString); break;
+	case ASSIGN: fprintf(listing,":=\t\t\t:=\n"); break;
+	case LT: fprintf(listing,"<\t\t\t<\n"); break;
+	case LE: fprintf(listing,"<=\t\t\t<=\n"); break;
+	case GT: fprintf(listing,">\t\t\t>\n"); break;
+	case GE: fprintf(listing,">=\t\t\t>=\n"); break;
+	case EQ: fprintf(listing,"=\t\t\t=\n"); break;
+	case LQBRACE: fprintf(listing,"{\t\t\t{\n"); break;
+	case RQBRACE: fprintf(listing,"}\t\t\t}\n"); break;
+	case LSBRACE: fprintf(listing,"[\t\t\t[\n"); break;
+	case RSBRACE: fprintf(listing,"]\t\t\t]\n"); break;
+	case LPAREN: fprintf(listing,"(\t\t\t(\n"); break;
+	case RPAREN: fprintf(listing,")\t\t\t)\n"); break;
+	case COMMA: fprintf(listing,",\t\t\t,\n"); break;
+	case SEMI: fprintf(listing,";\t\t\t;\n"); break;
+	case PLUS: fprintf(listing,"+\t\t\t+\n"); break;
+	case MINUS: fprintf(listing,"-\t\t\t-\n"); break;
+	case TIMES: fprintf(listing,"*\t\t\t*\n"); break;
+	case OVER: fprintf(listing,"/\t\t\t/\n"); break;
 	case ENDFILE: fprintf(listing,"EOF\n"); break;
 	case NUM:
 		fprintf(listing,
-			"NUM, val= %s\n",tokenString);
+			"NUM\t\t\t%s\n",tokenString);
 		break;
 	case ID:
 		fprintf(listing,
-			"ID, name= %s\n",tokenString);
+			"ID\t\t\t%s\n",tokenString);
 		break;
 	case ERROR:
 		fprintf(listing,
 			"ERROR: %s\n",tokenString);
 		break;
+	case COMMENT: break;
+	case COMMENTERR: fprintf(listing,"COMMENT ERROR\n");
 	default:/*shoud never happen*/
 		fprintf(listing,"Unknown token: %d\n",token);
 	}
