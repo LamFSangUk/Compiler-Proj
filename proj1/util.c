@@ -60,10 +60,10 @@ void printToken(TokenType token, const char* tokenString)
 		break;
 	case ERROR:
 		fprintf(listing,
-			"ERROR: %s\n",tokenString);
+			"ERROR\t\t\t%s\n",tokenString);
 		break;
 	case COMMENT: break;
-	case COMMENTERR: fprintf(listing,"COMMENT ERROR\n");
+	case COMMENTERR: fprintf(listing,"ERROR\t\t\tCOMMENT ERROR\n"); break;
 	default:/*shoud never happen*/
 		fprintf(listing,"Unknown token: %d\n",token);
 	}

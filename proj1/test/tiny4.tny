@@ -1,0 +1,6 @@
+/* binary search program */
+int arr[11111];
+int binarySearch(int x){
+	int _left=0, right=11111, mid;
+	return -1;
+}
