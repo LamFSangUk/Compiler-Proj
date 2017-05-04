@@ -28,20 +28,30 @@ static TreeNode * savedTree; /* stores syntax tree for later return */
 
 %% /* Grammar for TINY */
 
-program     : stmt_seq
+program     : dclr_list
                  { savedTree = $1;} 
             ;
-stmt_seq    : stmt_seq SEMI stmt
+dclr_list   : dclr_list dclr
                  { YYSTYPE t = $1;
                    if (t != NULL)
                    { while (t->sibling != NULL)
                         t = t->sibling;
-                     t->sibling = $3;
+                     t->sibling = $2;
                      $$ = $1; }
-                     else $$ = $3;
+                     else $$ = $2;
                  }
-            | stmt  { $$ = $1; }
+            | dclr  { $$ = $1; }
             ;
+dclr		: var_dclr	
+				{ $$ = $1; }
+			| func_dclr 
+				{ $$ = $1; }
+			;
+var_dclr	: type_spcf ID SEMI
+				{ $$ = $2; }
+			| type_spcf ID LSBRACE NUM RSBRACE SEMI
+				{ $$ = $2; }
+			;
 stmt        : if_stmt { $$ = $1; }
             | repeat_stmt { $$ = $1; }
             | assign_stmt { $$ = $1; }
