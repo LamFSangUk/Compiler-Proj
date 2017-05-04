@@ -3,6 +3,7 @@
 /* The parser interface for the TINY compiler       */
 /* Compiler Construction: Principles and Practice   */
 /* Kenneth C. Louden                                */
+/* Modified By Sang Uk                              */
 /****************************************************/
 
 #ifndef _PARSE_H_

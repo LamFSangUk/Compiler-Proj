@@ -31,7 +31,7 @@ whitespace  [ \t]+
 "void"			{return VOID;}
 "=="			{return SAME;}
 "!="			{return DIFF;}
-"="             {return EQ;}
+"="             {return ASSIGN;}
 "<"             {return LT;}
 "<="			{return LE;}
 ">"				{return GT;}
