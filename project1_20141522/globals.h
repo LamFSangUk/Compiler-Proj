@@ -30,13 +30,13 @@ typedef enum
 	/* book-keeping tokens */
 	{ENDFILE, ERROR,
 	/* reserved words */
-	IF, THEN, ELSE, END, REPEAT, UNTIL, READ, WRITE, 
+	IF,  ELSE, 
 	INT, WHILE, RETURN, VOID,
 	/* multicharacter tokens */
 	ID, NUM,
 	COMMENT, COMMENTERR,
 	/* special symbols */
-	ASSIGN, EQ, LT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI,
+	EQ, LT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI,
 	SAME, DIFF, LE, GT, GE, LQBRACE, RQBRACE, LSBRACE, RSBRACE, COMMA
 }TokenType;
 

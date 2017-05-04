@@ -18,11 +18,11 @@
 /* set NO_CODE to TRUE to get a compiler that does not
  * generate code
  */
-#define NO_CODE FALSE
+#define NO_CODE TRUE
 
 #include "util.h"
 #if NO_PARSE
-#include "scan.h"1
+#include "scan.h"
 #else
 #include "parse.h"
 #if !NO_ANALYZE
