@@ -20,23 +20,17 @@ void printToken(TokenType token, const char* tokenString)
 	case IF: 		fprintf(listing,"IF\t\t\t%s\n",tokenString); break;
 	case THEN: 		fprintf(listing,"THEN\t\t\t%s\n",tokenString); break;
 	case ELSE: 		fprintf(listing,"ELSE\t\t\t%s\n",tokenString); break;
-	case END: 		fprintf(listing,"END\t\t\t%s\n",tokenString); break;
-	case REPEAT:	fprintf(listing,"REPEAT\t\t\t%s\n",tokenString); break;
-	case UNTIL: 	fprintf(listing,"UNTIL\t\t\t%s\n",tokenString); break;
-	case READ: 		fprintf(listing,"READ\t\t\t%s\n",tokenString); break;
-	case WRITE: 	fprintf(listing,"WRITE\t\t\t%s\n",tokenString); break;	
 	case INT: 		fprintf(listing,"INT\t\t\t%s\n",tokenString); break;
 	case WHILE: 	fprintf(listing,"WHILE\t\t\t%s\n",tokenString); break;
 	case RETURN: 	fprintf(listing,"RETURN\t\t\t%s\n",tokenString); break;
 	case VOID: 		fprintf(listing,"VOID\t\t\t%s\n",tokenString); break;
-	case ASSIGN: 	fprintf(listing,":=\t\t\t:=\n"); break;	
+	case ASSIGN: 	fprintf(listing,"=\t\t\t=\n"); break;	
 	case SAME: 		fprintf(listing,"==\t\t\t==\n"); break;
 	case DIFF: 		fprintf(listing,"!=\t\t\t!=\n"); break;
 	case LT: 		fprintf(listing,"<\t\t\t<\n"); break;
 	case LE: 		fprintf(listing,"<=\t\t\t<=\n"); break;
 	case GT: 		fprintf(listing,">\t\t\t>\n"); break;
 	case GE: 		fprintf(listing,">=\t\t\t>=\n"); break;
-	case EQ: 		fprintf(listing,"=\t\t\t=\n"); break;
 	case LQBRACE: 	fprintf(listing,"{\t\t\t{\n"); break;
 	case RQBRACE: 	fprintf(listing,"}\t\t\t}\n"); break;
 	case LSBRACE: 	fprintf(listing,"[\t\t\t[\n"); break;
@@ -107,6 +101,27 @@ TreeNode * newExpNode(ExpKind kind)
 	}
 	return t;
 }
+
+/* Function newDclrNode creates a new declaration
+ * node for syntax tree construction
+*/ 
+TreeNode * newDclrNode(DclrKind kind)
+{
+	TreeNode * t = (TreeNode *) malloc(sizeof(TreeNode));
+	int i;
+	if(t==NULL)
+		fprintf(listing,"Out of memory error at line %d\n",lineno);
+	else{
+		for(i=0;i<MAXCHILDREN;i++) t->child[i] = NULL;
+		t->sibling = NULL;
+		t->nodekind = DclrK;
+		t->kind.dclr = kind;
+		t->lineno = lineno;
+		t->type = Void;
+	}
+	return t;
+}
+
 
 /* Function copyString allocates and makes a new
  * copy of an existing string

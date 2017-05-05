@@ -24,6 +24,11 @@ TreeNode * newStmtNode(StmtKind);
  */
 TreeNode * newExpNode(ExpKind);
 
+/* Function newDclrNode creates a new declaration
+ * node for syntax tree construction
+ */
+TreeNode * newDclrNode(DclrKind);
+
 /* Function copyString allocates and makes a new
  * copy of an existing string
  */
