@@ -13,13 +13,19 @@
 #include "scan.h"
 #include "parse.h"
 
+#define STACKSIZE 10000
+
 #define YYSTYPE TreeNode *
-static char * savedName; /* for use in assignments */
+static char * savedName[STACKSIZE]; /* for use in assignments */
 static int savedSize;
 static int savedNum;
 static DclrExpType savedType;
 static int savedLineNo;  /* ditto */
 static TreeNode * savedTree; /* stores syntax tree for later return */
+
+void PushName();
+char* PopName();
+int top=-1;
 
 %}
 
@@ -49,25 +55,21 @@ dclr		: var_dclr	{ $$ = $1; }
 			| func_dclr	{ $$ = $1; }
 			;
 var_dclr	: type_spcf ID
-				{ savedName = copyString(tokenString);
-				  savedLineNo = lineno;
-				} 
+				{ PushName(tokenString); } 
 			  SEMI
 				{ $$ = newDclrNode(VarK); 
-				  $$->lineno = savedLineNo;
-				  $$->attr.name = savedName;
+				  $$->lineno = lineno;
+				  $$->attr.name = PopName();
 				  $$->type = savedType;
 				}
 			| type_spcf ID 
-				{ savedName = copyString(tokenString);
-				  savedLineNo = lineno;
-				}
+				{ PushName(tokenString); }
 			  LSBRACE NUM
 				{ savedSize = atoi(tokenString); } 
 			  RSBRACE SEMI
 				{ $$ = newDclrNode(VarArrK); 
-				  $$->lineno = savedLineNo;
-				  $$->attr.name = savedName;
+				  $$->lineno = lineno;
+				  $$->attr.name = PopName();
 				  $$->type = savedType;
 				}
 			;
@@ -75,16 +77,14 @@ type_spcf	: INT	{ savedType = Integer; }
 			| VOID	{ savedType = Void; }
 			;
 func_dclr	: type_spcf ID
-				{ savedName = copyString(tokenStirng);
-				  savedLineNo = lineno;
-				}
+				{ PushName(tokenStirng); }
 			  LPAREN params RPAREN compstmt
 				{ $$ = newDclrNode(FuncK);	
 				  $$->child[0] = $1;
 				  $$->child[1] = $5;
 				  $$->child[2] = $7;
-				  $$->lineno = savedLineNo;
-				  $$->attr.name = savedName;
+				  $$->lineno = lineno;
+				  $$->attr.name = PopName();
 				}
 			;
 params		: para_list
@@ -114,14 +114,12 @@ param 		: type_spcf ID
 				  $$->attr.name = copyString(tokenString);
 				}
 			| type_spcf ID
-				{ savedName = copyString(tokenString);
-				  savedLineNo = lineno;
-				}
+				{ PushName(tokenString); }
 			  LSBRACE RSBRACE
 				{ $$ = newDclrNode(VarArrK);
 				  $$->child[0] = $1;
-				  $$->lineno = savedLineNo;
-				  $$->attr.name = savedName;
+				  $$->lineno = lineno;
+				  $$->attr.name = PopName();
 				}
 			;
 compstmt	: LQBRACE local_dclr stmt_list RQBRACE
@@ -205,11 +203,11 @@ var			: ID
 				  $$->attr.name = copyString(tokenString);
 				}
 			| ID
-				{ savedName = copyString(tokenString); }
+				{ PushName(tokenString); }
 			  LSBRACE exp RSBRACE
 				{ $$ = newExpNode(ArrK);
 				  $$->child[0] = $4;
-				  $$->attr.name=savedName;
+				  $$->attr.name=PopName();
 				}
 			;
 smpl_exp	: addexp relop addexp
@@ -283,11 +281,11 @@ factor		: LPAREN exp RPAREN { $$ = $2; }
 				{ $$ = newExpNode(ConstK);
 				  $$->attr.val = atoi(tokenString);
 			;
-call		: ID { savedName = copyString(tokenString); }
+call		: ID { PushName(tokenString); }
 			   LPAREN args RPAREN
 				{ $$ = newExpNode(CallK);
 				  $$->child[0] = $4;
-				  $$->attr.name = savedName;
+				  $$->attr.name = PopName();
 				}
 			;
 args		: arg_list { $$ = $1; }
@@ -326,3 +324,25 @@ TreeNode * parse(void)
   return savedTree;
 }
 
+void PushName(char* name){
+	if(top<STACKSIZE-1){
+		savedName[++top]=copyString(name);
+	}	
+	else{
+		fprintf(listing,"Name Stack is Full\n");
+		Error=TRUE;
+	}
+}
+char* PopName(){
+	if(top==-1){
+		fprintf(listing,"Name Stack is Empty\n");
+		Error=TRUE;
+		return NULL;
+	}
+	else{
+		char *ret;
+		ret=copyString(savedName[top]);
+		free(savedName[top--]);
+		return ret;
+	}
+}
