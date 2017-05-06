@@ -51,12 +51,16 @@
 /* Yacc/Bison generates its own integer values
  * for tokens
  */
+
+#define STACKSIZE 10000
 typedef int TokenType; 
 
 extern FILE* source; /* source code text file */
 extern FILE* listing; /* listing output text file */
 extern FILE* code; /* code text file for TM simulator */
-
+extern char * savedName[STACKSIZE]; /* for use in assignments */
+extern char * tempName;
+extern int top_name;
 extern int lineno; /* source line number for listing */
 
 /**************************************************/

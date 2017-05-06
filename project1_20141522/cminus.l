@@ -12,6 +12,10 @@
 #include "scan.h"
 /* lexeme of identifier or reserved word */
 char tokenString[MAXTOKENLEN+1];
+void PushName(char *);
+char *savedName[STACKSIZE];
+char *tempName;
+int top_name=-1;
 %}
 
 digit       [0-9]
@@ -49,7 +53,7 @@ whitespace  [ \t]+
 ","				{return COMMA;}
 ";"             {return SEMI;}
 {number}        {return NUM;}
-{identifier}    {return ID;}
+{identifier}    {tempName=copyString(yytext); return ID;}
 {newline}       {lineno++;}
 {whitespace}    {/* skip whitespace */}
 "/*"            { char c;
@@ -58,11 +62,11 @@ whitespace  [ \t]+
 					c=input();
 					if(c=='\n') lineno++;
 					if(c=='/' && flag)
-						return COMMENT;
+						break;
 					else if(c=='*') flag=TRUE;
 					else flag=FALSE;
 				  }
-				  return COMMENTERR;
+				  if( c==EOF ) return COMMENTERR;
                 }
 .               {return ERROR;}
 
@@ -79,10 +83,20 @@ TokenType getToken(void)
   }
   currentToken = yylex();
   strncpy(tokenString,yytext,MAXTOKENLEN);
+  fprintf(listing, "%d: %d %s\n",lineno,currentToken,tokenString);
   if (TraceScan) {
-    if(currentToken!=COMMENT) fprintf(listing,"\t%d\t\t ",lineno);
+    fprintf(listing,"\t%d\t\t ",lineno);
     printToken(currentToken,tokenString);
   }
   return currentToken;
 }
 
+void PushName(char* name){
+	if(top_name<STACKSIZE-1){
+		savedName[++top_name]=copyString(name);
+	}	
+	else{
+		fprintf(listing,"Name Stack is Full\n");
+		Error=TRUE;
+	}
+}

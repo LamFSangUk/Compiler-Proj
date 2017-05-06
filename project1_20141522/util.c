@@ -55,7 +55,6 @@ void printToken(TokenType token, const char* tokenString)
 		fprintf(listing,
 			"ERROR\t\t\t%s\n",tokenString);
 		break;
-	case COMMENT: break;
 	case COMMENTERR: fprintf(listing,"ERROR\t\t\tCOMMENT ERROR\n"); break;
 	default:/*shoud never happen*/
 		fprintf(listing,"Unknown token: %d\n",token);
@@ -138,6 +137,7 @@ char * copyString(char * s)
 	if(t==NULL)
 		fprintf(listing,"Out of memory error at line %d\n",lineno);
 	else strcpy(t,s);
+	fprintf(listing,"copying: %s\n",s);
 	return t;
 }
 
@@ -221,10 +221,16 @@ void printTree(TreeNode * tree)
 				fprintf(listing,"NonArray Variable Declaration\n");
 				INDENT;
 				printSpaces();
-				if(tree->type==Integer)
-					fprintf(listing,"Type: int\nId: %s\n",tree->attr.name);
-				else if(tree->type==Void)
-					fprintf(listing,"Type: void\nId: %s\n",tree->attr.name);
+				if(tree->type==Integer){
+					fprintf(listing,"Type: int\n");
+					printSpaces();
+					fprintf(listing,"Id: %s lineno %d\n",tree->attr.name,tree->lineno);
+				}
+				else if(tree->type==Void){
+					fprintf(listing,"Type: void\n");
+					printSpaces();
+					fprintf(listing,"Id: %s\n",tree->attr.name);
+				}
 				else
 					fprintf(listing,"Unknown Varaible Type\n");
 				UNINDENT;
@@ -234,6 +240,22 @@ void printTree(TreeNode * tree)
 				break;
 			case FuncK:
 				fprintf(listing,"Function Declaration\n");
+				INDENT;
+				printSpaces();
+				if(tree->type==Integer){
+					fprintf(listing,"Type: int\n");
+					printSpaces();
+					fprintf(listing,"Id: %s\n",tree->attr.name);
+				}
+				else if(tree->type==Void){
+					fprintf(listing,"Type: void\n");
+					printSpaces();
+					fprintf(listing,"Id: %s\n",tree->attr.name);
+				}
+				else
+					fprintf(listing,"Unknown Varaible Type\n");
+
+				UNINDENT;
 				break;
 			default:
 				fprintf(listing,"Unknown DclrNode kind\n");

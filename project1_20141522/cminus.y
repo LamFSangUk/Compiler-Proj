@@ -16,7 +16,8 @@
 #define STACKSIZE 10000
 
 #define YYSTYPE TreeNode *
-static char * savedName[STACKSIZE]; /* for use in assignments */
+//static char * savedName[STACKSIZE]; /* for use in assignments */
+//static char * tempName;
 static int savedSize;
 static int savedNum;
 static DclrExpType savedType[STACKSIZE];
@@ -24,17 +25,16 @@ static int savedLineNo;  /* ditto */
 static TreeNode * savedTree; /* stores syntax tree for later return */
 static int yylex();
 
-void PushName();
 char* PopName();
 void PushType();
 DclrExpType PopType();
-int top_name=-1;
+//int top_name=-1;
 int top_type=-1;
 
 %}
 
 %token IF ELSE INT WHILE RETURN VOID 
-%token ID NUM COMMENT
+%token ID NUM
 %token SAME DIFF
 %token ASSIGN LT LE GT GE PLUS MINUS TIMES OVER LPAREN RPAREN LQBRACE RQBRACE LSBRACE RSBRACE COMMA SEMI
 %token ERROR COMMENTERR ENDFILE 
@@ -43,7 +43,6 @@ int top_type=-1;
 %nonassoc LT LE GT GE SAME DIFF
 %left PLUS MINUS
 %left TIMES OVER
-%start program
 
 %% /* Grammar for CMINUS */
 
@@ -65,37 +64,43 @@ dclr		: var_dclr	{ $$ = $1; }
 			| func_dclr	{ $$ = $1; }
 			;
 var_dclr	: type_spcf ID
-				{ PushName(tokenString); } 
+				{ $$ = newDclrNode(VarK);
+				  $$->attr.name = tempName;
+				  fprintf(listing,"%s\n",tempName);
+				} 
 			  SEMI
-				{ $$ = newDclrNode(VarK); 
+				{ $$ = $3;
 				  $$->lineno = lineno;
-				  $$->attr.name = PopName();
 				  $$->type = PopType();
 				}
 			| type_spcf ID 
-				{ PushName(tokenString); }
+				{ $$ = newDclrNode(VarArrK);
+				  $$->attr.name = copyString(tokenString);
+				}
 			  LSBRACE NUM
-				{ savedSize = atoi(tokenString); } 
-			  RSBRACE SEMI
-				{ $$ = newDclrNode(VarArrK); 
-				  $$->lineno = lineno;
-				  $$->attr.name = PopName();
-				  $$->type = PopType();
+				{ $$ = $3;
+				  savedSize = atoi(tokenString); 
 				  $$->size = savedSize;
+				} 
+			  RSBRACE SEMI
+				{ $$ = $6; 
+				  $$->lineno = lineno;
+				  $$->type = PopType();
 				}
 			;
-type_spcf	: INT	{ PushType(Integer); }
-			| VOID	{ PushType(Void); }
+type_spcf	: INT	{ $$ = NULL; PushType(Integer); }
+			| VOID	{ $$ = NULL; PushType(Void); }
 			;
 func_dclr	: type_spcf ID
-				{ PushName(tokenString); }
+				{ $$ = newDclrNode(FuncK);
+				  $$->attr.name = copyString(tokenString);
+				}
 			  LPAREN params RPAREN compstmt
-				{ $$ = newDclrNode(FuncK);	
+				{ $$ = $3;	
 				  $$->child[0] = $5; /*parameter*/
 				  $$->child[1] = $7; /*body*/
 				  $$->lineno = lineno;
 				  $$->type = PopType();
-				  $$->attr.name = PopName();
 				}
 			;
 params		: para_list
@@ -123,11 +128,12 @@ param 		: type_spcf ID
 				  $$->type = PopType();
 				}
 			| type_spcf ID
-				{ PushName(tokenString); }
-			  LSBRACE RSBRACE
 				{ $$ = newDclrNode(VarArrK);
+				  $$->attr.name = copyString(tokenString);
+				}
+			  LSBRACE RSBRACE
+				{ $$ = $3;
 				  $$->lineno = lineno;
-				  $$->attr.name = PopName();
 				  $$->type = PopType();
 				}
 			;
@@ -212,11 +218,12 @@ var			: ID
 				  $$->attr.name = copyString(tokenString);
 				}
 			| ID
-				{ PushName(tokenString); }
+				{ $$ = newExpNode(ArrK);
+				  $$->attr.name = copyString(tokenString);
+				}
 			  LSBRACE exp RSBRACE
 				{ $$ = newExpNode(ArrK);
 				  $$->child[0] = $4;
-				  $$->attr.name=PopName();
 				}
 			;
 smpl_exp	: addexp relop addexp
@@ -291,11 +298,13 @@ factor		: LPAREN exp RPAREN { $$ = $2; }
 				  $$->attr.val = atoi(tokenString);
 				}
 			;
-call		: ID { PushName(tokenString); }
-			   LPAREN args RPAREN
+call		: ID 
 				{ $$ = newExpNode(CallK);
+				  $$->attr.name = copyString(tokenString);
+				}
+			   LPAREN args RPAREN
+				{ $$ = $2;
 				  $$->child[0] = $4;
-				  $$->attr.name = PopName();
 				}
 			;
 args		: arg_list { $$ = $1; }
@@ -335,7 +344,7 @@ TreeNode * parse(void)
   return savedTree;
 }
 
-void PushName(char* name){
+/*void PushName(char* name){
 	if(top_name<STACKSIZE-1){
 		savedName[++top_name]=copyString(name);
 	}	
@@ -343,7 +352,7 @@ void PushName(char* name){
 		fprintf(listing,"Name Stack is Full\n");
 		Error=TRUE;
 	}
-}
+}*/
 char* PopName(){
 	if(top_name==-1){
 		fprintf(listing,"Name Stack is Empty\n");
