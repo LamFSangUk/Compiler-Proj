@@ -42,10 +42,10 @@ FILE * code;
 
 /* allocate and set tracing flags */
 int EchoSource = TRUE;
-int TraceScan = TRUE;
+int TraceScan = FALSE;
 int TraceParse = TRUE;
-int TraceAnalyze = TRUE;
-int TraceCode = TRUE;
+int TraceAnalyze = FALSE;
+int TraceCode = FALSE;
 
 int Error = FALSE;
 
@@ -60,7 +60,7 @@ main(int argc, char * argv[])
 	}
 	strcpy(pgm, argv[1]);
 	if (strchr(pgm, '.') == NULL)
-		strcat(pgm, ".tny");
+		strcat(pgm, ".c");
 	source = fopen(pgm, "r");
 	if (source == NULL)
 	{
@@ -68,7 +68,7 @@ main(int argc, char * argv[])
 		exit(1);
 	}
 	listing = stdout; /*send listing to screen */
-	fprintf(listing, "\nTINY COMPILATION: %s\n", pgm);
+	fprintf(listing, "\nCMINUS COMPILATION: %s\n", pgm);
 #if NO_PARSE
 	fprintf(listing,"    line number\t\ttoken\t\t\tlexeme\n");
 	fprintf(listing,"---------------------------------------------------------\n");
@@ -108,5 +108,6 @@ main(int argc, char * argv[])
 #endif
 #endif
 #endif
+	fclose(source);
 	return 0;
 }

@@ -18,7 +18,6 @@ void printToken(TokenType token, const char* tokenString)
 	switch(token)
 	{
 	case IF: 		fprintf(listing,"IF\t\t\t%s\n",tokenString); break;
-	case THEN: 		fprintf(listing,"THEN\t\t\t%s\n",tokenString); break;
 	case ELSE: 		fprintf(listing,"ELSE\t\t\t%s\n",tokenString); break;
 	case INT: 		fprintf(listing,"INT\t\t\t%s\n",tokenString); break;
 	case WHILE: 	fprintf(listing,"WHILE\t\t\t%s\n",tokenString); break;
@@ -174,20 +173,20 @@ void printTree(TreeNode * tree)
 			case IfK:
 				fprintf(listing,"If\n");
 				break;
-			case RepeatK:
-				fprintf(listing,"Repeat\n");
+			case IfelseK:
+				fprintf(listing,"If Else\n");
 				break;
-			case AssignK:
-				fprintf(listing,"Assign to: %s\n",tree->attr.name);
+			case WhileK:
+				fprintf(listing,"While\n");
 				break;
-			case ReadK:
-				fprintf(listing,"Read: %s\n",tree->attr.name);
+			case ReturnK:
+				fprintf(listing,"Return\n");
 				break;
-			case WriteK:
-				fprintf(listing,"Write\n");
+			case CompK:
+				fprintf(listing,"Compound Statement\n");
 				break;
 			default:
-				fprintf(listing,"Unknown ExpNode kind\n");
+				fprintf(listing,"Unknown StmtNode kind\n");
 				break;
 			}
 		}
@@ -199,13 +198,45 @@ void printTree(TreeNode * tree)
 				printToken(tree->attr.op,"\0");
 				break;
 			case ConstK:
-				fprintf(listing,"const: %d\n",tree->attr.val);
+				fprintf(listing,"Const: %d\n",tree->attr.val);
 				break;
 			case IdK:
-				fprintf(listing,"Id: %s\n",tree->attr.name);
+				fprintf(listing,"Var Id: %s\n",tree->attr.name);
+				break;
+			case ArrK:
+				fprintf(listing,"Arr Id: %s\n",tree->attr.name);
+				break;
+			case CallK:
+				fprintf(listing,"Function Call: %s\n",tree->attr.name);
 				break;
 			default:
 				fprintf(listing,"Unknown ExpNode kind\n");
+				break;
+			}
+		}
+		else if(tree->nodekind==DclrK)
+		{
+			switch(tree->kind.dclr){
+			case VarK:
+				fprintf(listing,"NonArray Variable Declaration\n");
+				INDENT;
+				printSpaces();
+				if(tree->type==Integer)
+					fprintf(listing,"Type: int\nId: %s\n",tree->attr.name);
+				else if(tree->type==Void)
+					fprintf(listing,"Type: void\nId: %s\n",tree->attr.name);
+				else
+					fprintf(listing,"Unknown Varaible Type\n");
+				UNINDENT;
+				break;
+			case VarArrK:
+				fprintf(listing,"Array Variable Declaration\n");
+				break;
+			case FuncK:
+				fprintf(listing,"Function Declaration\n");
+				break;
+			default:
+				fprintf(listing,"Unknown DclrNode kind\n");
 				break;
 			}
 		}

@@ -1,26 +1,7 @@
-CC = gcc
-CFLAG = 
-OBJECTS = main.o util.o lex.yy.o
-TARGET = 20141522
+20141522:
+	bison -d -v cminus.y
+	flex cminus.l
+	gcc main.c util.c lex.yy.c cminus.tab.c -o 20141522 -lfl
+clean:
+	rm 20141522 lex.yy.c cminus.output cminus.tab.c cminus.tab.h
 
-all : $(TARGET)
-
-$(TARGET) : $(OBJECTS)
-			$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) -lfl
-# Mac OS X -ll Option
-# Linux L -lfl Option
-
-main.o : main.c globals.h util.h scan.h
-			$(CC) $(CFLAGS) -c main.c
-
-util.o : util.c util.h globals.h
-			$(CC) $(CFLAGS) -c util.c
-
-lex.yy.o : lex.yy.c scan.h
-			$(CC) $(CFLAGS) -c lex.yy.c
-
-lex.yy.c : tiny.l
-			flex tiny.l
-
-clean :
-			rm -f $(OBJECTS) $(TARGET) lex.yy.c

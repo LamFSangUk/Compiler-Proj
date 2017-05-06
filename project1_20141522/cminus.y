@@ -19,13 +19,17 @@
 static char * savedName[STACKSIZE]; /* for use in assignments */
 static int savedSize;
 static int savedNum;
-static DclrExpType savedType;
+static DclrExpType savedType[STACKSIZE];
 static int savedLineNo;  /* ditto */
 static TreeNode * savedTree; /* stores syntax tree for later return */
+static int yylex();
 
 void PushName();
 char* PopName();
-int top=-1;
+void PushType();
+DclrExpType PopType();
+int top_name=-1;
+int top_type=-1;
 
 %}
 
@@ -35,7 +39,13 @@ int top=-1;
 %token ASSIGN LT LE GT GE PLUS MINUS TIMES OVER LPAREN RPAREN LQBRACE RQBRACE LSBRACE RSBRACE COMMA SEMI
 %token ERROR COMMENTERR ENDFILE 
 
-%% /* Grammar for TINY */
+%right ASSIGN
+%nonassoc LT LE GT GE SAME DIFF
+%left PLUS MINUS
+%left TIMES OVER
+%start program
+
+%% /* Grammar for CMINUS */
 
 program     : dclr_list
                  { savedTree = $1;} 
@@ -60,7 +70,7 @@ var_dclr	: type_spcf ID
 				{ $$ = newDclrNode(VarK); 
 				  $$->lineno = lineno;
 				  $$->attr.name = PopName();
-				  $$->type = savedType;
+				  $$->type = PopType();
 				}
 			| type_spcf ID 
 				{ PushName(tokenString); }
@@ -70,30 +80,28 @@ var_dclr	: type_spcf ID
 				{ $$ = newDclrNode(VarArrK); 
 				  $$->lineno = lineno;
 				  $$->attr.name = PopName();
-				  $$->type = savedType;
+				  $$->type = PopType();
 				  $$->size = savedSize;
 				}
 			;
-type_spcf	: INT	{ savedType = Integer; }
-			| VOID	{ savedType = Void; }
+type_spcf	: INT	{ PushType(Integer); }
+			| VOID	{ PushType(Void); }
 			;
 func_dclr	: type_spcf ID
-				{ PushName(tokenStirng); }
+				{ PushName(tokenString); }
 			  LPAREN params RPAREN compstmt
 				{ $$ = newDclrNode(FuncK);	
-				  $$->child[0] = $1;
-				  $$->child[1] = $5;
-				  $$->child[2] = $7;
+				  $$->child[0] = $5; /*parameter*/
+				  $$->child[1] = $7; /*body*/
 				  $$->lineno = lineno;
+				  $$->type = PopType();
 				  $$->attr.name = PopName();
 				}
 			;
 params		: para_list
 				{ $$ = $1; }
 			| VOID
-			    { $$ = newExpNode(TypeK);
-				  $$->type = Void;
-				}
+			    { $$ = NULL; }
 			;
 para_list	: para_list COMMA param
 				{ YYSTYPE t = $1;
@@ -110,17 +118,17 @@ para_list	: para_list COMMA param
 			; 
 param 		: type_spcf ID
 				{ $$ = newDclrNode(VarK);
-				  $$->child[0] = $1;
 				  $$->lineno = lineno;
 				  $$->attr.name = copyString(tokenString);
+				  $$->type = PopType();
 				}
 			| type_spcf ID
 				{ PushName(tokenString); }
 			  LSBRACE RSBRACE
 				{ $$ = newDclrNode(VarArrK);
-				  $$->child[0] = $1;
 				  $$->lineno = lineno;
 				  $$->attr.name = PopName();
+				  $$->type = PopType();
 				}
 			;
 compstmt	: LQBRACE local_dclr stmt_list RQBRACE
@@ -153,9 +161,9 @@ stmt_list	: stmt_list stmt
 					$$ = $1;
 				  }
 				  else $$ = $2;
-				} /* empty */
+				} 
+			| /* empty */
 				{ $$ = NULL; }
-			|
 			;
 stmt		: expstmt	{ $$ = $1; }
 			| compstmt	{ $$ = $1; }
@@ -281,6 +289,7 @@ factor		: LPAREN exp RPAREN { $$ = $2; }
 			| NUM
 				{ $$ = newExpNode(ConstK);
 				  $$->attr.val = atoi(tokenString);
+				}
 			;
 call		: ID { PushName(tokenString); }
 			   LPAREN args RPAREN
@@ -290,7 +299,8 @@ call		: ID { PushName(tokenString); }
 				}
 			;
 args		: arg_list { $$ = $1; }
-			| /* empty */
+			| /* empty */ 
+				{ $$ = NULL; }
 			;
 arg_list	: arg_list COMMA exp
 				{ YYSTYPE t = $1;
@@ -326,8 +336,8 @@ TreeNode * parse(void)
 }
 
 void PushName(char* name){
-	if(top<STACKSIZE-1){
-		savedName[++top]=copyString(name);
+	if(top_name<STACKSIZE-1){
+		savedName[++top_name]=copyString(name);
 	}	
 	else{
 		fprintf(listing,"Name Stack is Full\n");
@@ -335,15 +345,35 @@ void PushName(char* name){
 	}
 }
 char* PopName(){
-	if(top==-1){
+	if(top_name==-1){
 		fprintf(listing,"Name Stack is Empty\n");
 		Error=TRUE;
 		return NULL;
 	}
 	else{
 		char *ret;
-		ret=copyString(savedName[top]);
-		free(savedName[top--]);
+		ret=copyString(savedName[top_name]);
+		free(savedName[top_name--]);
 		return ret;
 	}
 }
+void PushType(DclrExpType type){
+	if(top_type<STACKSIZE-1){
+		savedType[++top_type]=type;
+	}	
+	else{
+		fprintf(listing,"Type Stack is Full\n");
+		Error=TRUE;
+	}
+}
+DclrExpType PopType(){
+	if(top_type==-1){
+		fprintf(listing,"Type Stack is Empty\n");
+		Error=TRUE;
+		return -1;
+	}
+	else{
+		return savedType[top_type--];
+	}
+}
+
