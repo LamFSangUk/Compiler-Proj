@@ -78,6 +78,7 @@ TreeNode * newStmtNode(StmtKind kind)
 		t->nodekind = StmtK;
 		t->kind.stmt = kind;
 		t->lineno = lineno;
+		t->size = 0;
 	}
 	return t;
 }
@@ -98,6 +99,7 @@ TreeNode * newExpNode(ExpKind kind)
 		t->kind.exp = kind;
 		t->lineno = lineno;
 		t->type = Void;
+		t->size = 0;
 	}
 	return t;
 }
@@ -118,6 +120,7 @@ TreeNode * newDclrNode(DclrKind kind)
 		t->kind.dclr = kind;
 		t->lineno = lineno;
 		t->type = Void;
+		t->size = 0;
 	}
 	return t;
 }

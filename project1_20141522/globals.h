@@ -82,6 +82,7 @@ typedef struct treeNode
      union { TokenType op;
              int val;
              char * name; } attr;
+	 int size;
      DclrExpType type; /* for type checking of exps and dclrs */
    } TreeNode;
 

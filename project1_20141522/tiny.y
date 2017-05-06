@@ -71,6 +71,7 @@ var_dclr	: type_spcf ID
 				  $$->lineno = lineno;
 				  $$->attr.name = PopName();
 				  $$->type = savedType;
+				  $$->size = savedSize;
 				}
 			;
 type_spcf	: INT	{ savedType = Integer; }
