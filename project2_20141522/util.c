@@ -138,7 +138,6 @@ char * copyString(char * s)
 	if(t==NULL)
 		fprintf(listing,"Out of memory error at line %d\n",lineno);
 	else strcpy(t,s);
-	fprintf(listing,"copying: %s\n",s);
 	return t;
 }
 
