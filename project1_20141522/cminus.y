@@ -122,6 +122,7 @@ param 		: type_spcf ID
 				  $$->lineno = lineno;
 				  $$->attr.name = savedName;
 				  $$->type = PopType();
+				  $$->para = TRUE;
 				}
 			| type_spcf ID
 				{ $$ = newDclrNode(VarArrK);
@@ -131,6 +132,7 @@ param 		: type_spcf ID
 				{ $$ = $3;
 				  $$->lineno = lineno;
 				  $$->type = PopType();
+				  $$->para = TRUE;
 				}
 			;
 compstmt	: LQBRACE local_dclr stmt_list RQBRACE
@@ -218,7 +220,7 @@ var			: ID
 				  $$->attr.name = savedName;
 				}
 			  LSBRACE exp RSBRACE
-				{ $$ = newExpNode(ArrK);
+				{ $$ = $2;
 				  $$->child[0] = $4;
 				}
 			;

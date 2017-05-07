@@ -23,13 +23,13 @@ void printToken(TokenType token, const char* tokenString)
 	case WHILE: 	fprintf(listing,"WHILE\t\t\t%s\n",tokenString); break;
 	case RETURN: 	fprintf(listing,"RETURN\t\t\t%s\n",tokenString); break;
 	case VOID: 		fprintf(listing,"VOID\t\t\t%s\n",tokenString); break;
-	case ASSIGN: 	fprintf(listing,"=\t\t\t=\n"); break;	
-	case SAME: 		fprintf(listing,"==\t\t\t==\n"); break;
-	case DIFF: 		fprintf(listing,"!=\t\t\t!=\n"); break;
-	case LT: 		fprintf(listing,"<\t\t\t<\n"); break;
-	case LE: 		fprintf(listing,"<=\t\t\t<=\n"); break;
-	case GT: 		fprintf(listing,">\t\t\t>\n"); break;
-	case GE: 		fprintf(listing,">=\t\t\t>=\n"); break;
+	case ASSIGN: 	fprintf(listing,"=\n"); break;	
+	case SAME: 		fprintf(listing,"==\n"); break;
+	case DIFF: 		fprintf(listing,"!=\n"); break;
+	case LT: 		fprintf(listing,"<\n"); break;
+	case LE: 		fprintf(listing,"<=\n"); break;
+	case GT: 		fprintf(listing,">\n"); break;
+	case GE: 		fprintf(listing,">=\n"); break;
 	case LQBRACE: 	fprintf(listing,"{\t\t\t{\n"); break;
 	case RQBRACE: 	fprintf(listing,"}\t\t\t}\n"); break;
 	case LSBRACE: 	fprintf(listing,"[\t\t\t[\n"); break;
@@ -38,10 +38,10 @@ void printToken(TokenType token, const char* tokenString)
 	case RPAREN: 	fprintf(listing,")\t\t\t)\n"); break;
 	case COMMA: 	fprintf(listing,",\t\t\t,\n"); break;
 	case SEMI: 		fprintf(listing,";\t\t\t;\n"); break;
-	case PLUS: 		fprintf(listing,"+\t\t\t+\n"); break;
-	case MINUS: 	fprintf(listing,"-\t\t\t-\n"); break;
-	case TIMES: 	fprintf(listing,"*\t\t\t*\n"); break;
-	case OVER: 		fprintf(listing,"/\t\t\t/\n"); break;
+	case PLUS: 		fprintf(listing,"+\n"); break;
+	case MINUS: 	fprintf(listing,"-\n"); break;
+	case TIMES: 	fprintf(listing,"*\n"); break;
+	case OVER: 		fprintf(listing,"/\n"); break;
 	case ENDFILE: 	fprintf(listing,"EOF\n"); break;
 	case NUM:
 		fprintf(listing,
@@ -119,6 +119,7 @@ TreeNode * newDclrNode(DclrKind kind)
 		t->lineno = lineno;
 		t->type = Void;
 		t->size = 0;
+		t->para = FALSE;
 	}
 	return t;
 }
@@ -145,6 +146,7 @@ char * copyString(char * s)
  * store current number of spaces to indent
  */
 static indentno = 0;
+int assignflag = 0;
 
 /* macros to increase/decrease indentation */
 #define INDENT indentno+=2
@@ -166,18 +168,23 @@ void printTree(TreeNode * tree)
 	int i;
 	INDENT;
 	while(tree!=NULL){
-		printSpaces();
+		if(assignflag==0) printSpaces();
+		
 		if(tree->nodekind==StmtK)
 		{
 			switch(tree->kind.stmt){
 			case IfK:
 				fprintf(listing,"If\n");
+				printSpaces();
+				fprintf(listing,"Condition:\n");
 				break;
 			case IfelseK:
 				fprintf(listing,"If Else\n");
 				break;
 			case WhileK:
 				fprintf(listing,"While\n");
+				printSpaces();
+				fprintf(listing,"Condition:\n");
 				break;
 			case ReturnK:
 				fprintf(listing,"Return\n");
@@ -194,17 +201,31 @@ void printTree(TreeNode * tree)
 		{
 			switch(tree->kind.exp){
 			case OpK:
-				fprintf(listing,"Op: ");
-				printToken(tree->attr.op,"\0");
+				if(tree->attr.op==ASSIGN){
+					fprintf(listing,"ASSIGN to: ");
+					assignflag++;
+				}
+				else{
+					fprintf(listing,"Op: ");
+					printToken(tree->attr.op,"\0");
+				}
 				break;
 			case ConstK:
 				fprintf(listing,"Const: %d\n",tree->attr.val);
 				break;
 			case IdK:
-				fprintf(listing,"Var Id: %s\n",tree->attr.name);
+				if(assignflag>0) {
+					fprintf(listing, "%s\n",tree->attr.name);
+					assignflag--;
+				}
+				else fprintf(listing,"Var Id: %s\n",tree->attr.name);
 				break;
 			case ArrK:
-				fprintf(listing,"Arr Id: %s\n",tree->attr.name);
+				if(assignflag>0){
+					fprintf(listing, "%s\n",tree->attr.name);
+					assignflag--;
+				}
+				else fprintf(listing,"Arr Id: %s\n",tree->attr.name);
 				break;
 			case CallK:
 				fprintf(listing,"Function Call: %s\n",tree->attr.name);
@@ -218,13 +239,16 @@ void printTree(TreeNode * tree)
 		{
 			switch(tree->kind.dclr){
 			case VarK:
-				fprintf(listing,"NonArray Variable Declaration\n");
+				if(tree->para == TRUE)
+					fprintf(listing,"NonArray Varaible Parameter\n");
+				else
+					fprintf(listing,"NonArray Variable Declaration\n");
 				INDENT;
 				printSpaces();
 				if(tree->type==Integer){
 					fprintf(listing,"Type: int\n");
 					printSpaces();
-					fprintf(listing,"Id: %s lineno %d\n",tree->attr.name,tree->lineno);
+					fprintf(listing,"Id: %s\n",tree->attr.name);
 				}
 				else if(tree->type==Void){
 					fprintf(listing,"Type: void\n");
@@ -236,7 +260,34 @@ void printTree(TreeNode * tree)
 				UNINDENT;
 				break;
 			case VarArrK:
-				fprintf(listing,"Array Variable Declaration\n");
+				if(tree->para == TRUE)
+					fprintf(listing,"Array Variable Parameter\n");
+				else
+					fprintf(listing,"Array Variable Declaration\n");
+				INDENT;
+				printSpaces();
+				if(tree->type==Integer){
+					fprintf(listing,"Type: int\n");
+					printSpaces();
+					fprintf(listing,"Id: %s\n",tree->attr.name);
+					if(tree->para == FALSE){
+						printSpaces();
+						fprintf(listing,"Size: %d\n",tree->size);
+					}
+				}
+				else if(tree->type==Void){
+					fprintf(listing,"Type: void\n");
+					printSpaces();
+					fprintf(listing,"Id: %s\n",tree->attr.name);
+					if(tree->para == FALSE){
+						printSpaces();
+						fprintf(listing,"Size: %d\n",tree->size);
+					}
+
+				}
+				else
+					fprintf(listing,"Unknown Varaible Type\n");
+				UNINDENT;
 				break;
 			case FuncK:
 				fprintf(listing,"Function Declaration\n");

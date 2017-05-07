@@ -1,0 +1,1311 @@
+Terminals unused in grammar
+
+   ERROR
+   COMMENTERR
+   ENDFILE
+
+
+State 101 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: dclr_list
+
+    2 dclr_list: dclr_list dclr
+    3          | dclr
+
+    4 dclr: var_dclr
+    5     | func_dclr
+
+    6 @1: %empty
+
+    7 var_dclr: type_spcf ID @1 SEMI
+
+    8 @2: %empty
+
+    9 @3: %empty
+
+   10 var_dclr: type_spcf ID @2 LSBRACE NUM @3 RSBRACE SEMI
+
+   11 type_spcf: INT
+   12          | VOID
+
+   13 @4: %empty
+
+   14 func_dclr: type_spcf ID @4 LPAREN params RPAREN compstmt
+
+   15 params: para_list
+   16       | VOID
+
+   17 para_list: para_list COMMA param
+   18          | param
+
+   19 param: type_spcf ID
+
+   20 @5: %empty
+
+   21 param: type_spcf ID @5 LSBRACE RSBRACE
+
+   22 compstmt: LQBRACE local_dclr stmt_list RQBRACE
+
+   23 local_dclr: local_dclr var_dclr
+   24           | %empty
+
+   25 stmt_list: stmt_list stmt
+   26          | %empty
+
+   27 stmt: expstmt
+   28     | compstmt
+   29     | selstmt
+   30     | iterstmt
+   31     | retstmt
+
+   32 expstmt: exp SEMI
+   33        | SEMI
+
+   34 selstmt: IF LPAREN exp RPAREN stmt
+   35        | IF LPAREN exp RPAREN stmt ELSE stmt
+
+   36 iterstmt: WHILE LPAREN exp RPAREN stmt
+
+   37 retstmt: RETURN SEMI
+   38        | RETURN exp SEMI
+
+   39 exp: var ASSIGN exp
+   40    | smpl_exp
+
+   41 var: ID
+
+   42 @6: %empty
+
+   43 var: ID @6 LSBRACE exp RSBRACE
+
+   44 smpl_exp: addexp relop addexp
+   45         | addexp
+
+   46 relop: LE
+   47      | LT
+   48      | GT
+   49      | GE
+   50      | SAME
+   51      | DIFF
+
+   52 addexp: addexp addop term
+   53       | term
+
+   54 addop: PLUS
+   55      | MINUS
+
+   56 term: term mulop factor
+   57     | factor
+
+   58 mulop: TIMES
+   59      | OVER
+
+   60 factor: LPAREN exp RPAREN
+   61       | var
+   62       | call
+   63       | NUM
+
+   64 @7: %empty
+
+   65 call: ID @7 LPAREN args RPAREN
+
+   66 args: arg_list
+   67     | %empty
+
+   68 arg_list: arg_list COMMA exp
+   69         | exp
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+IF (258) 34 35
+ELSE (259) 35
+INT (260) 11
+WHILE (261) 36
+RETURN (262) 37 38
+VOID (263) 12 16
+ID (264) 7 10 14 19 21 41 43 65
+NUM (265) 10 63
+SAME (266) 50
+DIFF (267) 51
+ASSIGN (268) 39
+LT (269) 47
+LE (270) 46
+GT (271) 48
+GE (272) 49
+PLUS (273) 54
+MINUS (274) 55
+TIMES (275) 58
+OVER (276) 59
+LPAREN (277) 14 34 35 36 60 65
+RPAREN (278) 14 34 35 36 60 65
+LQBRACE (279) 22
+RQBRACE (280) 22
+LSBRACE (281) 10 21 43
+RSBRACE (282) 10 21 43
+COMMA (283) 17 68
+SEMI (284) 7 10 32 33 37 38
+ERROR (285)
+COMMENTERR (286)
+ENDFILE (287)
+
+
+Nonterminals, with rules where they appear
+
+$accept (33)
+    on left: 0
+program (34)
+    on left: 1, on right: 0
+dclr_list (35)
+    on left: 2 3, on right: 1 2
+dclr (36)
+    on left: 4 5, on right: 2 3
+var_dclr (37)
+    on left: 7 10, on right: 4 23
+@1 (38)
+    on left: 6, on right: 7
+@2 (39)
+    on left: 8, on right: 10
+@3 (40)
+    on left: 9, on right: 10
+type_spcf (41)
+    on left: 11 12, on right: 7 10 14 19 21
+func_dclr (42)
+    on left: 14, on right: 5
+@4 (43)
+    on left: 13, on right: 14
+params (44)
+    on left: 15 16, on right: 14
+para_list (45)
+    on left: 17 18, on right: 15 17
+param (46)
+    on left: 19 21, on right: 17 18
+@5 (47)
+    on left: 20, on right: 21
+compstmt (48)
+    on left: 22, on right: 14 28
+local_dclr (49)
+    on left: 23 24, on right: 22 23
+stmt_list (50)
+    on left: 25 26, on right: 22 25
+stmt (51)
+    on left: 27 28 29 30 31, on right: 25 34 35 36
+expstmt (52)
+    on left: 32 33, on right: 27
+selstmt (53)
+    on left: 34 35, on right: 29
+iterstmt (54)
+    on left: 36, on right: 30
+retstmt (55)
+    on left: 37 38, on right: 31
+exp (56)
+    on left: 39 40, on right: 32 34 35 36 38 39 43 60 68 69
+var (57)
+    on left: 41 43, on right: 39 61
+@6 (58)
+    on left: 42, on right: 43
+smpl_exp (59)
+    on left: 44 45, on right: 40
+relop (60)
+    on left: 46 47 48 49 50 51, on right: 44
+addexp (61)
+    on left: 52 53, on right: 44 45 52
+addop (62)
+    on left: 54 55, on right: 52
+term (63)
+    on left: 56 57, on right: 52 53 56
+mulop (64)
+    on left: 58 59, on right: 56
+factor (65)
+    on left: 60 61 62 63, on right: 56 57
+call (66)
+    on left: 65, on right: 62
+@7 (67)
+    on left: 64, on right: 65
+args (68)
+    on left: 66 67, on right: 65
+arg_list (69)
+    on left: 68 69, on right: 66 68
+
+
+State 0
+
+    0 $accept: . program $end
+
+    INT   shift, and go to state 1
+    VOID  shift, and go to state 2
+
+    program    go to state 3
+    dclr_list  go to state 4
+    dclr       go to state 5
+    var_dclr   go to state 6
+    type_spcf  go to state 7
+    func_dclr  go to state 8
+
+
+State 1
+
+   11 type_spcf: INT .
+
+    $default  reduce using rule 11 (type_spcf)
+
+
+State 2
+
+   12 type_spcf: VOID .
+
+    $default  reduce using rule 12 (type_spcf)
+
+
+State 3
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 9
+
+
+State 4
+
+    1 program: dclr_list .
+    2 dclr_list: dclr_list . dclr
+
+    INT   shift, and go to state 1
+    VOID  shift, and go to state 2
+
+    $default  reduce using rule 1 (program)
+
+    dclr       go to state 10
+    var_dclr   go to state 6
+    type_spcf  go to state 7
+    func_dclr  go to state 8
+
+
+State 5
+
+    3 dclr_list: dclr .
+
+    $default  reduce using rule 3 (dclr_list)
+
+
+State 6
+
+    4 dclr: var_dclr .
+
+    $default  reduce using rule 4 (dclr)
+
+
+State 7
+
+    7 var_dclr: type_spcf . ID @1 SEMI
+   10         | type_spcf . ID @2 LSBRACE NUM @3 RSBRACE SEMI
+   14 func_dclr: type_spcf . ID @4 LPAREN params RPAREN compstmt
+
+    ID  shift, and go to state 11
+
+
+State 8
+
+    5 dclr: func_dclr .
+
+    $default  reduce using rule 5 (dclr)
+
+
+State 9
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 10
+
+    2 dclr_list: dclr_list dclr .
+
+    $default  reduce using rule 2 (dclr_list)
+
+
+State 11
+
+    7 var_dclr: type_spcf ID . @1 SEMI
+   10         | type_spcf ID . @2 LSBRACE NUM @3 RSBRACE SEMI
+   14 func_dclr: type_spcf ID . @4 LPAREN params RPAREN compstmt
+
+    LPAREN    reduce using rule 13 (@4)
+    LSBRACE   reduce using rule 8 (@2)
+    $default  reduce using rule 6 (@1)
+
+    @1  go to state 12
+    @2  go to state 13
+    @4  go to state 14
+
+
+State 12
+
+    7 var_dclr: type_spcf ID @1 . SEMI
+
+    SEMI  shift, and go to state 15
+
+
+State 13
+
+   10 var_dclr: type_spcf ID @2 . LSBRACE NUM @3 RSBRACE SEMI
+
+    LSBRACE  shift, and go to state 16
+
+
+State 14
+
+   14 func_dclr: type_spcf ID @4 . LPAREN params RPAREN compstmt
+
+    LPAREN  shift, and go to state 17
+
+
+State 15
+
+    7 var_dclr: type_spcf ID @1 SEMI .
+
+    $default  reduce using rule 7 (var_dclr)
+
+
+State 16
+
+   10 var_dclr: type_spcf ID @2 LSBRACE . NUM @3 RSBRACE SEMI
+
+    NUM  shift, and go to state 18
+
+
+State 17
+
+   14 func_dclr: type_spcf ID @4 LPAREN . params RPAREN compstmt
+
+    INT   shift, and go to state 1
+    VOID  shift, and go to state 19
+
+    type_spcf  go to state 20
+    params     go to state 21
+    para_list  go to state 22
+    param      go to state 23
+
+
+State 18
+
+   10 var_dclr: type_spcf ID @2 LSBRACE NUM . @3 RSBRACE SEMI
+
+    $default  reduce using rule 9 (@3)
+
+    @3  go to state 24
+
+
+State 19
+
+   12 type_spcf: VOID .
+   16 params: VOID .
+
+    RPAREN    reduce using rule 16 (params)
+    $default  reduce using rule 12 (type_spcf)
+
+
+State 20
+
+   19 param: type_spcf . ID
+   21      | type_spcf . ID @5 LSBRACE RSBRACE
+
+    ID  shift, and go to state 25
+
+
+State 21
+
+   14 func_dclr: type_spcf ID @4 LPAREN params . RPAREN compstmt
+
+    RPAREN  shift, and go to state 26
+
+
+State 22
+
+   15 params: para_list .
+   17 para_list: para_list . COMMA param
+
+    COMMA  shift, and go to state 27
+
+    $default  reduce using rule 15 (params)
+
+
+State 23
+
+   18 para_list: param .
+
+    $default  reduce using rule 18 (para_list)
+
+
+State 24
+
+   10 var_dclr: type_spcf ID @2 LSBRACE NUM @3 . RSBRACE SEMI
+
+    RSBRACE  shift, and go to state 28
+
+
+State 25
+
+   19 param: type_spcf ID .
+   21      | type_spcf ID . @5 LSBRACE RSBRACE
+
+    LSBRACE   reduce using rule 20 (@5)
+    $default  reduce using rule 19 (param)
+
+    @5  go to state 29
+
+
+State 26
+
+   14 func_dclr: type_spcf ID @4 LPAREN params RPAREN . compstmt
+
+    LQBRACE  shift, and go to state 30
+
+    compstmt  go to state 31
+
+
+State 27
+
+   17 para_list: para_list COMMA . param
+
+    INT   shift, and go to state 1
+    VOID  shift, and go to state 2
+
+    type_spcf  go to state 20
+    param      go to state 32
+
+
+State 28
+
+   10 var_dclr: type_spcf ID @2 LSBRACE NUM @3 RSBRACE . SEMI
+
+    SEMI  shift, and go to state 33
+
+
+State 29
+
+   21 param: type_spcf ID @5 . LSBRACE RSBRACE
+
+    LSBRACE  shift, and go to state 34
+
+
+State 30
+
+   22 compstmt: LQBRACE . local_dclr stmt_list RQBRACE
+
+    $default  reduce using rule 24 (local_dclr)
+
+    local_dclr  go to state 35
+
+
+State 31
+
+   14 func_dclr: type_spcf ID @4 LPAREN params RPAREN compstmt .
+
+    $default  reduce using rule 14 (func_dclr)
+
+
+State 32
+
+   17 para_list: para_list COMMA param .
+
+    $default  reduce using rule 17 (para_list)
+
+
+State 33
+
+   10 var_dclr: type_spcf ID @2 LSBRACE NUM @3 RSBRACE SEMI .
+
+    $default  reduce using rule 10 (var_dclr)
+
+
+State 34
+
+   21 param: type_spcf ID @5 LSBRACE . RSBRACE
+
+    RSBRACE  shift, and go to state 36
+
+
+State 35
+
+   22 compstmt: LQBRACE local_dclr . stmt_list RQBRACE
+   23 local_dclr: local_dclr . var_dclr
+
+    INT   shift, and go to state 1
+    VOID  shift, and go to state 2
+
+    $default  reduce using rule 26 (stmt_list)
+
+    var_dclr   go to state 37
+    type_spcf  go to state 38
+    stmt_list  go to state 39
+
+
+State 36
+
+   21 param: type_spcf ID @5 LSBRACE RSBRACE .
+
+    $default  reduce using rule 21 (param)
+
+
+State 37
+
+   23 local_dclr: local_dclr var_dclr .
+
+    $default  reduce using rule 23 (local_dclr)
+
+
+State 38
+
+    7 var_dclr: type_spcf . ID @1 SEMI
+   10         | type_spcf . ID @2 LSBRACE NUM @3 RSBRACE SEMI
+
+    ID  shift, and go to state 40
+
+
+State 39
+
+   22 compstmt: LQBRACE local_dclr stmt_list . RQBRACE
+   25 stmt_list: stmt_list . stmt
+
+    IF       shift, and go to state 41
+    WHILE    shift, and go to state 42
+    RETURN   shift, and go to state 43
+    ID       shift, and go to state 44
+    NUM      shift, and go to state 45
+    LPAREN   shift, and go to state 46
+    LQBRACE  shift, and go to state 30
+    RQBRACE  shift, and go to state 47
+    SEMI     shift, and go to state 48
+
+    compstmt  go to state 49
+    stmt      go to state 50
+    expstmt   go to state 51
+    selstmt   go to state 52
+    iterstmt  go to state 53
+    retstmt   go to state 54
+    exp       go to state 55
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 40
+
+    7 var_dclr: type_spcf ID . @1 SEMI
+   10         | type_spcf ID . @2 LSBRACE NUM @3 RSBRACE SEMI
+
+    LSBRACE   reduce using rule 8 (@2)
+    $default  reduce using rule 6 (@1)
+
+    @1  go to state 12
+    @2  go to state 13
+
+
+State 41
+
+   34 selstmt: IF . LPAREN exp RPAREN stmt
+   35        | IF . LPAREN exp RPAREN stmt ELSE stmt
+
+    LPAREN  shift, and go to state 62
+
+
+State 42
+
+   36 iterstmt: WHILE . LPAREN exp RPAREN stmt
+
+    LPAREN  shift, and go to state 63
+
+
+State 43
+
+   37 retstmt: RETURN . SEMI
+   38        | RETURN . exp SEMI
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+    SEMI    shift, and go to state 64
+
+    exp       go to state 65
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 44
+
+   41 var: ID .
+   43    | ID . @6 LSBRACE exp RSBRACE
+   65 call: ID . @7 LPAREN args RPAREN
+
+    LPAREN    reduce using rule 64 (@7)
+    LSBRACE   reduce using rule 42 (@6)
+    $default  reduce using rule 41 (var)
+
+    @6  go to state 66
+    @7  go to state 67
+
+
+State 45
+
+   63 factor: NUM .
+
+    $default  reduce using rule 63 (factor)
+
+
+State 46
+
+   60 factor: LPAREN . exp RPAREN
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    exp       go to state 68
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 47
+
+   22 compstmt: LQBRACE local_dclr stmt_list RQBRACE .
+
+    $default  reduce using rule 22 (compstmt)
+
+
+State 48
+
+   33 expstmt: SEMI .
+
+    $default  reduce using rule 33 (expstmt)
+
+
+State 49
+
+   28 stmt: compstmt .
+
+    $default  reduce using rule 28 (stmt)
+
+
+State 50
+
+   25 stmt_list: stmt_list stmt .
+
+    $default  reduce using rule 25 (stmt_list)
+
+
+State 51
+
+   27 stmt: expstmt .
+
+    $default  reduce using rule 27 (stmt)
+
+
+State 52
+
+   29 stmt: selstmt .
+
+    $default  reduce using rule 29 (stmt)
+
+
+State 53
+
+   30 stmt: iterstmt .
+
+    $default  reduce using rule 30 (stmt)
+
+
+State 54
+
+   31 stmt: retstmt .
+
+    $default  reduce using rule 31 (stmt)
+
+
+State 55
+
+   32 expstmt: exp . SEMI
+
+    SEMI  shift, and go to state 69
+
+
+State 56
+
+   39 exp: var . ASSIGN exp
+   61 factor: var .
+
+    ASSIGN  shift, and go to state 70
+
+    $default  reduce using rule 61 (factor)
+
+
+State 57
+
+   40 exp: smpl_exp .
+
+    $default  reduce using rule 40 (exp)
+
+
+State 58
+
+   44 smpl_exp: addexp . relop addexp
+   45         | addexp .
+   52 addexp: addexp . addop term
+
+    SAME   shift, and go to state 71
+    DIFF   shift, and go to state 72
+    LT     shift, and go to state 73
+    LE     shift, and go to state 74
+    GT     shift, and go to state 75
+    GE     shift, and go to state 76
+    PLUS   shift, and go to state 77
+    MINUS  shift, and go to state 78
+
+    $default  reduce using rule 45 (smpl_exp)
+
+    relop  go to state 79
+    addop  go to state 80
+
+
+State 59
+
+   53 addexp: term .
+   56 term: term . mulop factor
+
+    TIMES  shift, and go to state 81
+    OVER   shift, and go to state 82
+
+    $default  reduce using rule 53 (addexp)
+
+    mulop  go to state 83
+
+
+State 60
+
+   57 term: factor .
+
+    $default  reduce using rule 57 (term)
+
+
+State 61
+
+   62 factor: call .
+
+    $default  reduce using rule 62 (factor)
+
+
+State 62
+
+   34 selstmt: IF LPAREN . exp RPAREN stmt
+   35        | IF LPAREN . exp RPAREN stmt ELSE stmt
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    exp       go to state 84
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 63
+
+   36 iterstmt: WHILE LPAREN . exp RPAREN stmt
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    exp       go to state 85
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 64
+
+   37 retstmt: RETURN SEMI .
+
+    $default  reduce using rule 37 (retstmt)
+
+
+State 65
+
+   38 retstmt: RETURN exp . SEMI
+
+    SEMI  shift, and go to state 86
+
+
+State 66
+
+   43 var: ID @6 . LSBRACE exp RSBRACE
+
+    LSBRACE  shift, and go to state 87
+
+
+State 67
+
+   65 call: ID @7 . LPAREN args RPAREN
+
+    LPAREN  shift, and go to state 88
+
+
+State 68
+
+   60 factor: LPAREN exp . RPAREN
+
+    RPAREN  shift, and go to state 89
+
+
+State 69
+
+   32 expstmt: exp SEMI .
+
+    $default  reduce using rule 32 (expstmt)
+
+
+State 70
+
+   39 exp: var ASSIGN . exp
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    exp       go to state 90
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 71
+
+   50 relop: SAME .
+
+    $default  reduce using rule 50 (relop)
+
+
+State 72
+
+   51 relop: DIFF .
+
+    $default  reduce using rule 51 (relop)
+
+
+State 73
+
+   47 relop: LT .
+
+    $default  reduce using rule 47 (relop)
+
+
+State 74
+
+   46 relop: LE .
+
+    $default  reduce using rule 46 (relop)
+
+
+State 75
+
+   48 relop: GT .
+
+    $default  reduce using rule 48 (relop)
+
+
+State 76
+
+   49 relop: GE .
+
+    $default  reduce using rule 49 (relop)
+
+
+State 77
+
+   54 addop: PLUS .
+
+    $default  reduce using rule 54 (addop)
+
+
+State 78
+
+   55 addop: MINUS .
+
+    $default  reduce using rule 55 (addop)
+
+
+State 79
+
+   44 smpl_exp: addexp relop . addexp
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    var     go to state 91
+    addexp  go to state 92
+    term    go to state 59
+    factor  go to state 60
+    call    go to state 61
+
+
+State 80
+
+   52 addexp: addexp addop . term
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    var     go to state 91
+    term    go to state 93
+    factor  go to state 60
+    call    go to state 61
+
+
+State 81
+
+   58 mulop: TIMES .
+
+    $default  reduce using rule 58 (mulop)
+
+
+State 82
+
+   59 mulop: OVER .
+
+    $default  reduce using rule 59 (mulop)
+
+
+State 83
+
+   56 term: term mulop . factor
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    var     go to state 91
+    factor  go to state 94
+    call    go to state 61
+
+
+State 84
+
+   34 selstmt: IF LPAREN exp . RPAREN stmt
+   35        | IF LPAREN exp . RPAREN stmt ELSE stmt
+
+    RPAREN  shift, and go to state 95
+
+
+State 85
+
+   36 iterstmt: WHILE LPAREN exp . RPAREN stmt
+
+    RPAREN  shift, and go to state 96
+
+
+State 86
+
+   38 retstmt: RETURN exp SEMI .
+
+    $default  reduce using rule 38 (retstmt)
+
+
+State 87
+
+   43 var: ID @6 LSBRACE . exp RSBRACE
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    exp       go to state 97
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 88
+
+   65 call: ID @7 LPAREN . args RPAREN
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    $default  reduce using rule 67 (args)
+
+    exp       go to state 98
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+    args      go to state 99
+    arg_list  go to state 100
+
+
+State 89
+
+   60 factor: LPAREN exp RPAREN .
+
+    $default  reduce using rule 60 (factor)
+
+
+State 90
+
+   39 exp: var ASSIGN exp .
+
+    $default  reduce using rule 39 (exp)
+
+
+State 91
+
+   61 factor: var .
+
+    $default  reduce using rule 61 (factor)
+
+
+State 92
+
+   44 smpl_exp: addexp relop addexp .
+   52 addexp: addexp . addop term
+
+    PLUS   shift, and go to state 77
+    MINUS  shift, and go to state 78
+
+    $default  reduce using rule 44 (smpl_exp)
+
+    addop  go to state 80
+
+
+State 93
+
+   52 addexp: addexp addop term .
+   56 term: term . mulop factor
+
+    TIMES  shift, and go to state 81
+    OVER   shift, and go to state 82
+
+    $default  reduce using rule 52 (addexp)
+
+    mulop  go to state 83
+
+
+State 94
+
+   56 term: term mulop factor .
+
+    $default  reduce using rule 56 (term)
+
+
+State 95
+
+   34 selstmt: IF LPAREN exp RPAREN . stmt
+   35        | IF LPAREN exp RPAREN . stmt ELSE stmt
+
+    IF       shift, and go to state 41
+    WHILE    shift, and go to state 42
+    RETURN   shift, and go to state 43
+    ID       shift, and go to state 44
+    NUM      shift, and go to state 45
+    LPAREN   shift, and go to state 46
+    LQBRACE  shift, and go to state 30
+    SEMI     shift, and go to state 48
+
+    compstmt  go to state 49
+    stmt      go to state 101
+    expstmt   go to state 51
+    selstmt   go to state 52
+    iterstmt  go to state 53
+    retstmt   go to state 54
+    exp       go to state 55
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 96
+
+   36 iterstmt: WHILE LPAREN exp RPAREN . stmt
+
+    IF       shift, and go to state 41
+    WHILE    shift, and go to state 42
+    RETURN   shift, and go to state 43
+    ID       shift, and go to state 44
+    NUM      shift, and go to state 45
+    LPAREN   shift, and go to state 46
+    LQBRACE  shift, and go to state 30
+    SEMI     shift, and go to state 48
+
+    compstmt  go to state 49
+    stmt      go to state 102
+    expstmt   go to state 51
+    selstmt   go to state 52
+    iterstmt  go to state 53
+    retstmt   go to state 54
+    exp       go to state 55
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 97
+
+   43 var: ID @6 LSBRACE exp . RSBRACE
+
+    RSBRACE  shift, and go to state 103
+
+
+State 98
+
+   69 arg_list: exp .
+
+    $default  reduce using rule 69 (arg_list)
+
+
+State 99
+
+   65 call: ID @7 LPAREN args . RPAREN
+
+    RPAREN  shift, and go to state 104
+
+
+State 100
+
+   66 args: arg_list .
+   68 arg_list: arg_list . COMMA exp
+
+    COMMA  shift, and go to state 105
+
+    $default  reduce using rule 66 (args)
+
+
+State 101
+
+   34 selstmt: IF LPAREN exp RPAREN stmt .
+   35        | IF LPAREN exp RPAREN stmt . ELSE stmt
+
+    ELSE  shift, and go to state 106
+
+    ELSE      [reduce using rule 34 (selstmt)]
+    $default  reduce using rule 34 (selstmt)
+
+
+State 102
+
+   36 iterstmt: WHILE LPAREN exp RPAREN stmt .
+
+    $default  reduce using rule 36 (iterstmt)
+
+
+State 103
+
+   43 var: ID @6 LSBRACE exp RSBRACE .
+
+    $default  reduce using rule 43 (var)
+
+
+State 104
+
+   65 call: ID @7 LPAREN args RPAREN .
+
+    $default  reduce using rule 65 (call)
+
+
+State 105
+
+   68 arg_list: arg_list COMMA . exp
+
+    ID      shift, and go to state 44
+    NUM     shift, and go to state 45
+    LPAREN  shift, and go to state 46
+
+    exp       go to state 107
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 106
+
+   35 selstmt: IF LPAREN exp RPAREN stmt ELSE . stmt
+
+    IF       shift, and go to state 41
+    WHILE    shift, and go to state 42
+    RETURN   shift, and go to state 43
+    ID       shift, and go to state 44
+    NUM      shift, and go to state 45
+    LPAREN   shift, and go to state 46
+    LQBRACE  shift, and go to state 30
+    SEMI     shift, and go to state 48
+
+    compstmt  go to state 49
+    stmt      go to state 108
+    expstmt   go to state 51
+    selstmt   go to state 52
+    iterstmt  go to state 53
+    retstmt   go to state 54
+    exp       go to state 55
+    var       go to state 56
+    smpl_exp  go to state 57
+    addexp    go to state 58
+    term      go to state 59
+    factor    go to state 60
+    call      go to state 61
+
+
+State 107
+
+   68 arg_list: arg_list COMMA exp .
+
+    $default  reduce using rule 68 (arg_list)
+
+
+State 108
+
+   35 selstmt: IF LPAREN exp RPAREN stmt ELSE stmt .
+
+    $default  reduce using rule 35 (selstmt)

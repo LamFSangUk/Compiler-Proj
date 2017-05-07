@@ -87,6 +87,7 @@ typedef struct treeNode
              int val;
              char * name; } attr;
 	 int size;
+	 short para;
      DclrExpType type; /* for type checking of exps and dclrs */
    } TreeNode;
 
