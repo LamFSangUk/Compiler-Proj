@@ -17,9 +17,7 @@
 
 #define YYSTYPE TreeNode *
 //static char * savedName[STACKSIZE]; /* for use in assignments */
-//static char * tempName;
 static int savedSize;
-static int savedNum;
 static DclrExpType savedType[STACKSIZE];
 static int savedLineNo;  /* ditto */
 static TreeNode * savedTree; /* stores syntax tree for later return */
@@ -65,8 +63,7 @@ dclr		: var_dclr	{ $$ = $1; }
 			;
 var_dclr	: type_spcf ID
 				{ $$ = newDclrNode(VarK);
-				  $$->attr.name = tempName;
-				  fprintf(listing,"%s\n",tempName);
+				  $$->attr.name = savedName;
 				} 
 			  SEMI
 				{ $$ = $3;
@@ -75,12 +72,11 @@ var_dclr	: type_spcf ID
 				}
 			| type_spcf ID 
 				{ $$ = newDclrNode(VarArrK);
-				  $$->attr.name = copyString(tokenString);
+				  $$->attr.name = savedName;
 				}
 			  LSBRACE NUM
 				{ $$ = $3;
-				  savedSize = atoi(tokenString); 
-				  $$->size = savedSize;
+				  $$->size = savedNum;
 				} 
 			  RSBRACE SEMI
 				{ $$ = $6; 
@@ -93,7 +89,7 @@ type_spcf	: INT	{ $$ = NULL; PushType(Integer); }
 			;
 func_dclr	: type_spcf ID
 				{ $$ = newDclrNode(FuncK);
-				  $$->attr.name = copyString(tokenString);
+				  $$->attr.name = savedName;
 				}
 			  LPAREN params RPAREN compstmt
 				{ $$ = $3;	
@@ -124,12 +120,12 @@ para_list	: para_list COMMA param
 param 		: type_spcf ID
 				{ $$ = newDclrNode(VarK);
 				  $$->lineno = lineno;
-				  $$->attr.name = copyString(tokenString);
+				  $$->attr.name = savedName;
 				  $$->type = PopType();
 				}
 			| type_spcf ID
 				{ $$ = newDclrNode(VarArrK);
-				  $$->attr.name = copyString(tokenString);
+				  $$->attr.name = savedName;
 				}
 			  LSBRACE RSBRACE
 				{ $$ = $3;
@@ -215,11 +211,11 @@ exp			: var ASSIGN exp
 			;
 var			: ID 
 				{ $$ = newExpNode(IdK); 
-				  $$->attr.name = copyString(tokenString);
+				  $$->attr.name = savedName;
 				}
 			| ID
 				{ $$ = newExpNode(ArrK);
-				  $$->attr.name = copyString(tokenString);
+				  $$->attr.name = savedName;
 				}
 			  LSBRACE exp RSBRACE
 				{ $$ = newExpNode(ArrK);
@@ -295,12 +291,12 @@ factor		: LPAREN exp RPAREN { $$ = $2; }
 			| call	{ $$ = $1; }
 			| NUM
 				{ $$ = newExpNode(ConstK);
-				  $$->attr.val = atoi(tokenString);
+				  $$->attr.val = savedNum;
 				}
 			;
 call		: ID 
 				{ $$ = newExpNode(CallK);
-				  $$->attr.name = copyString(tokenString);
+				  $$->attr.name = savedName;
 				}
 			   LPAREN args RPAREN
 				{ $$ = $2;
@@ -353,19 +349,6 @@ TreeNode * parse(void)
 		Error=TRUE;
 	}
 }*/
-char* PopName(){
-	if(top_name==-1){
-		fprintf(listing,"Name Stack is Empty\n");
-		Error=TRUE;
-		return NULL;
-	}
-	else{
-		char *ret;
-		ret=copyString(savedName[top_name]);
-		free(savedName[top_name--]);
-		return ret;
-	}
-}
 void PushType(DclrExpType type){
 	if(top_type<STACKSIZE-1){
 		savedType[++top_type]=type;

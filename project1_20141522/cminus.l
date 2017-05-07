@@ -12,10 +12,8 @@
 #include "scan.h"
 /* lexeme of identifier or reserved word */
 char tokenString[MAXTOKENLEN+1];
-void PushName(char *);
-char *savedName[STACKSIZE];
-char *tempName;
-int top_name=-1;
+char *savedName;
+int savedNum;
 %}
 
 digit       [0-9]
@@ -52,8 +50,8 @@ whitespace  [ \t]+
 "]"				{return RSBRACE;}
 ","				{return COMMA;}
 ";"             {return SEMI;}
-{number}        {return NUM;}
-{identifier}    {tempName=copyString(yytext); return ID;}
+{number}        {savedNum = atoi(yytext); return NUM;}
+{identifier}    {savedName = copyString(yytext); return ID;}
 {newline}       {lineno++;}
 {whitespace}    {/* skip whitespace */}
 "/*"            { char c;
@@ -89,14 +87,4 @@ TokenType getToken(void)
     printToken(currentToken,tokenString);
   }
   return currentToken;
-}
-
-void PushName(char* name){
-	if(top_name<STACKSIZE-1){
-		savedName[++top_name]=copyString(name);
-	}	
-	else{
-		fprintf(listing,"Name Stack is Full\n");
-		Error=TRUE;
-	}
 }
