@@ -16,17 +16,13 @@
 #define STACKSIZE 10000
 
 #define YYSTYPE TreeNode *
-//static char * savedName[STACKSIZE]; /* for use in assignments */
-static int savedSize;
 static DclrExpType savedType[STACKSIZE];
 static int savedLineNo;  /* ditto */
 static TreeNode * savedTree; /* stores syntax tree for later return */
 static int yylex();
 
-char* PopName();
 void PushType();
 DclrExpType PopType();
-//int top_name=-1;
 int top_type=-1;
 
 %}
@@ -342,15 +338,6 @@ TreeNode * parse(void)
   return savedTree;
 }
 
-/*void PushName(char* name){
-	if(top_name<STACKSIZE-1){
-		savedName[++top_name]=copyString(name);
-	}	
-	else{
-		fprintf(listing,"Name Stack is Full\n");
-		Error=TRUE;
-	}
-}*/
 void PushType(DclrExpType type){
 	if(top_type<STACKSIZE-1){
 		savedType[++top_type]=type;

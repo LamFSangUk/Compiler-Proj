@@ -17,12 +17,12 @@ void printToken(TokenType token, const char* tokenString)
 {
 	switch(token)
 	{
-	case IF: 		fprintf(listing,"IF\t\t\t%s\n",tokenString); break;
-	case ELSE: 		fprintf(listing,"ELSE\t\t\t%s\n",tokenString); break;
-	case INT: 		fprintf(listing,"INT\t\t\t%s\n",tokenString); break;
-	case WHILE: 	fprintf(listing,"WHILE\t\t\t%s\n",tokenString); break;
-	case RETURN: 	fprintf(listing,"RETURN\t\t\t%s\n",tokenString); break;
-	case VOID: 		fprintf(listing,"VOID\t\t\t%s\n",tokenString); break;
+	case IF: 		fprintf(listing,"IF\n"); break;
+	case ELSE: 		fprintf(listing,"ELSE\n"); break;
+	case INT: 		fprintf(listing,"INT\n"); break;
+	case WHILE: 	fprintf(listing,"WHILE\n"); break;
+	case RETURN: 	fprintf(listing,"RETURNs\n"); break;
+	case VOID: 		fprintf(listing,"VOID\n"); break;
 	case ASSIGN: 	fprintf(listing,"=\n"); break;	
 	case SAME: 		fprintf(listing,"==\n"); break;
 	case DIFF: 		fprintf(listing,"!=\n"); break;
@@ -30,14 +30,14 @@ void printToken(TokenType token, const char* tokenString)
 	case LE: 		fprintf(listing,"<=\n"); break;
 	case GT: 		fprintf(listing,">\n"); break;
 	case GE: 		fprintf(listing,">=\n"); break;
-	case LQBRACE: 	fprintf(listing,"{\t\t\t{\n"); break;
-	case RQBRACE: 	fprintf(listing,"}\t\t\t}\n"); break;
-	case LSBRACE: 	fprintf(listing,"[\t\t\t[\n"); break;
-	case RSBRACE: 	fprintf(listing,"]\t\t\t]\n"); break;
-	case LPAREN: 	fprintf(listing,"(\t\t\t(\n"); break;
-	case RPAREN: 	fprintf(listing,")\t\t\t)\n"); break;
-	case COMMA: 	fprintf(listing,",\t\t\t,\n"); break;
-	case SEMI: 		fprintf(listing,";\t\t\t;\n"); break;
+	case LQBRACE: 	fprintf(listing,"{\n"); break;
+	case RQBRACE: 	fprintf(listing,"}\n"); break;
+	case LSBRACE: 	fprintf(listing,"[\n"); break;
+	case RSBRACE: 	fprintf(listing,"]\n"); break;
+	case LPAREN: 	fprintf(listing,"(\n"); break;
+	case RPAREN: 	fprintf(listing,")\n"); break;
+	case COMMA: 	fprintf(listing,",\n"); break;
+	case SEMI: 		fprintf(listing,";\n"); break;
 	case PLUS: 		fprintf(listing,"+\n"); break;
 	case MINUS: 	fprintf(listing,"-\n"); break;
 	case TIMES: 	fprintf(listing,"*\n"); break;
@@ -45,17 +45,17 @@ void printToken(TokenType token, const char* tokenString)
 	case ENDFILE: 	fprintf(listing,"EOF\n"); break;
 	case NUM:
 		fprintf(listing,
-			"NUM\t\t\t%s\n",tokenString);
+			"NUM\t%s\n",tokenString);
 		break;
 	case ID:
 		fprintf(listing,
-			"ID\t\t\t%s\n",tokenString);
+			"ID\t%s\n",tokenString);
 		break;
 	case ERROR:
 		fprintf(listing,
-			"ERROR\t\t\t%s\n",tokenString);
+			"ERROR\t%s\n",tokenString);
 		break;
-	case COMMENTERR: fprintf(listing,"ERROR\t\t\tCOMMENT ERROR\n"); break;
+	case COMMENTERR: fprintf(listing,"ERROR\tCOMMENT ERROR\n"); break;
 	default:/*shoud never happen*/
 		fprintf(listing,"Unknown token: %d\n",token);
 	}
@@ -179,6 +179,8 @@ void printTree(TreeNode * tree)
 				break;
 			case IfelseK:
 				fprintf(listing,"If Else\n");
+				printSpaces();
+				fprintf(listing,"Condition:\n");
 				break;
 			case WhileK:
 				fprintf(listing,"While\n");
@@ -221,10 +223,10 @@ void printTree(TreeNode * tree)
 				break;
 			case ArrK:
 				if(assignflag>0){
-					fprintf(listing, "%s\n",tree->attr.name);
+					fprintf(listing, "%s[]\n",tree->attr.name);
 					assignflag--;
 				}
-				else fprintf(listing,"Arr Id: %s\n",tree->attr.name);
+				else fprintf(listing,"Arr Id: %s[]\n",tree->attr.name);
 				break;
 			case CallK:
 				fprintf(listing,"Function Call: %s\n",tree->attr.name);
@@ -268,7 +270,7 @@ void printTree(TreeNode * tree)
 				if(tree->type==Integer){
 					fprintf(listing,"Type: int\n");
 					printSpaces();
-					fprintf(listing,"Id: %s\n",tree->attr.name);
+					fprintf(listing,"Id: %s[]\n",tree->attr.name);
 					if(tree->para == FALSE){
 						printSpaces();
 						fprintf(listing,"Size: %d\n",tree->size);
