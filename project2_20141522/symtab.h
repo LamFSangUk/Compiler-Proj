@@ -25,6 +25,9 @@ int st_lookup ( char * name );
  * listing of the symbol table contents 
  * to the listing file
  */
+
+void st_scopeup();
+void st_scopedown();
 void printSymTab(FILE * listing);
 
 #endif

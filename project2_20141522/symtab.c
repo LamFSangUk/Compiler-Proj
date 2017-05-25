@@ -53,7 +53,14 @@ typedef struct BucketListRec
    } * BucketList;
 
 /* the hash table */
-static BucketList hashTable[SIZE];
+//static BucketList hashTable[SIZE];
+typedef struct SymbolTableList{
+	BucketList hashTable[SIZE];
+	int scope_lev;
+	struct SymbolTableList * next;
+}*SymTabList;
+
+SymTabList st;
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
@@ -93,6 +100,33 @@ int st_lookup ( char * name )
     l = l->next;
   if (l == NULL) return -1;
   else return l->memloc;
+}
+
+void st_scopeup(){
+	int i;
+	SymTabList newst = (SymTabList)malloc(sizeof(struct SymbolTableList));
+
+	if(st){
+		newst->scope_lev = st->scope_lev+1;
+		newst->next = st;
+	}
+	else{
+		newst->scope_lev = 0;
+		newst->next = NULL;
+	}
+
+	//initialize the hashtab.
+	for(i=0;i<SIZE;i++) new->hashTable[i]=NULL;
+
+	st = newst;
+}
+
+void st_scopedown(){
+	if(st){
+		SymTabList temp = st->next;
+		free(st);
+		st=temp;
+	}
 }
 
 /* Procedure printSymTab prints a formatted 
