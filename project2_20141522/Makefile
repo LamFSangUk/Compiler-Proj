@@ -1,6 +1,6 @@
 CC = gcc
 CFLAG = 
-OBJECTS = main.o util.o lex.yy.o cminus.tab.o
+OBJECTS = main.o util.o lex.yy.o cminus.tab.o symtab.o analyze.o
 TARGET = 20141522
 
 all : $(TARGET)
@@ -15,6 +15,12 @@ main.o : main.c globals.h util.h scan.h lex.yy.c cminus.tab.c
 
 util.o : util.c util.h globals.h
 			$(CC) $(CFLAGS) -c util.c
+
+symtab.o : symtab.c symtab.h
+			$(CC) $(CFLAGS) -c symtab.c
+
+analyze.o : analyze.c symtab.h globals.h 
+			$(CC) $(CFLAGS) -g -c analyze.c
 
 lex.yy.o : lex.yy.c scan.h util.h globals.h
 			$(CC) $(CFLAGS) -c lex.yy.c

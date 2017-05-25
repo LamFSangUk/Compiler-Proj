@@ -32,6 +32,12 @@ static void traverse( TreeNode * t,
   }
 }
 
+static void symtabError(TreeNode * t, char * msg)
+{
+	fprintf(listing,"Symbol error at line %d: %s\n",t->lineno, msg);
+	Error = TRUE;
+}
+
 /* nullProc is a do-nothing procedure to 
  * generate preorder-only or postorder-only
  * traversals from traverse
@@ -45,20 +51,17 @@ static void nullProc(TreeNode * t)
  * identifiers stored in t into 
  * the symbol table 
  */
+static int funcscope=FALSE;
 static void insertNode( TreeNode * t)
 { switch (t->nodekind)
   { case StmtK:
       switch (t->kind.stmt)
-      { case AssignK:
-        case ReadK:
-          if (st_lookup(t->attr.name) == -1)
-          /* not yet in table, so treat as new definition */
-            st_insert(t->attr.name,t->lineno,location++);
-          else
-          /* already in table, so ignore location, 
-             add line number of use only */ 
-            st_insert(t->attr.name,t->lineno,0);
-          break;
+      { case CompK:
+			if(!funcscope)
+				st_scopeup();
+			else 
+				funcscope=FALSE;
+			break;
         default:
           break;
       }
@@ -66,9 +69,13 @@ static void insertNode( TreeNode * t)
     case ExpK:
       switch (t->kind.exp)
       { case IdK:
-          if (st_lookup(t->attr.name) == -1)
+		case ArrK:
+		case CallK:
+			fprintf(listing,"%s\n",t->attr.name);
+
+          if (st_lookup(t->attr.name,1) == -1)
           /* not yet in table, so treat as new definition */
-            st_insert(t->attr.name,t->lineno,location++);
+            symtabError(t,"Undeclared Symbol");
           else
           /* already in table, so ignore location, 
              add line number of use only */ 
@@ -79,6 +86,28 @@ static void insertNode( TreeNode * t)
       }
       break;
 	case DclrK:
+		switch(t->kind.dclr){
+			case VarK:
+			case VarArrK:
+				if(st_lookup(t->attr.name,0)>-1)
+				/* already in table, so it is an error. */
+					symtabError(t,"Already Declared");
+				else
+					st_insert(t->attr.name,t->lineno,location++);
+					fprintf(listing,"%s\n",t->attr.name);
+				break;
+			case FuncK:	
+				
+				if(st_lookup(t->attr.name,0)>-1)
+					/* already in table, so it is an error. */
+					symtabError(t,"Already Declared");
+				else{
+					st_insert(t->attr.name,t->lineno,location++);
+					funcscope=TRUE;
+					st_scopeup();
+				}
+				break;
+		}
 		break;
     default:
       break;
@@ -108,7 +137,7 @@ static void typeError(TreeNode * t, char * message)
  * type checking at a single tree node
  */
 static void checkNode(TreeNode * t)
-{ switch (t->nodekind)
+{ /*switch (t->nodekind)
   { case ExpK:
       switch (t->kind.exp)
       { case OpK:
@@ -153,7 +182,7 @@ static void checkNode(TreeNode * t)
     default:
       break;
 
-  }
+  }*/
 }
 
 /* Procedure typeCheck performs type checking 

@@ -47,6 +47,7 @@ typedef struct LineListRec
  */
 typedef struct BucketListRec
    { char * name;
+//	 DclrExpType type;
      LineList lines;
      int memloc ; /* memory location for variable */
      struct BucketListRec * next;
@@ -69,7 +70,7 @@ SymTabList st;
  */
 void st_insert( char * name, int lineno, int loc )
 { int h = hash(name);
-  BucketList l =  hashTable[h];
+  BucketList l =  st->hashTable[h];
   while ((l != NULL) && (strcmp(name,l->name) != 0))
     l = l->next;
   if (l == NULL) /* variable not yet in table */
@@ -79,8 +80,8 @@ void st_insert( char * name, int lineno, int loc )
     l->lines->lineno = lineno;
     l->memloc = loc;
     l->lines->next = NULL;
-    l->next = hashTable[h];
-    hashTable[h] = l; }
+    l->next = st->hashTable[h];
+    st->hashTable[h] = l; }
   else /* found in table, so just add line number */
   { LineList t = l->lines;
     while (t->next != NULL) t = t->next;
@@ -93,13 +94,22 @@ void st_insert( char * name, int lineno, int loc )
 /* Function st_lookup returns the memory 
  * location of a variable or -1 if not found
  */
-int st_lookup ( char * name )
+int st_lookup ( char * name, int mode)
+// mpde 0 for just current scope
+// mode 1 for all scope
 { int h = hash(name);
-  BucketList l =  hashTable[h];
-  while ((l != NULL) && (strcmp(name,l->name) != 0))
-    l = l->next;
-  if (l == NULL) return -1;
-  else return l->memloc;
+	SymTabList temp=st;
+ 	while(temp!=NULL){
+		BucketList l =  temp->hashTable[h];
+ 		while ((l != NULL) && (strcmp(name,l->name) != 0))
+    		l = l->next;
+  		if (l == NULL) {
+			if(mode==0) return -1;
+			else temp=temp->next;
+		}
+  		else return l->memloc;
+	}
+	return -1;
 }
 
 void st_scopeup(){
@@ -116,9 +126,10 @@ void st_scopeup(){
 	}
 
 	//initialize the hashtab.
-	for(i=0;i<SIZE;i++) new->hashTable[i]=NULL;
+	for(i=0;i<SIZE;i++) newst->hashTable[i]=NULL;
 
 	st = newst;
+	printf("scopeup %d\n",st->scope_lev);
 }
 
 void st_scopedown(){
@@ -138,8 +149,8 @@ void printSymTab(FILE * listing)
   fprintf(listing,"Variable Name  Location   Line Numbers\n");
   fprintf(listing,"-------------  --------   ------------\n");
   for (i=0;i<SIZE;++i)
-  { if (hashTable[i] != NULL)
-    { BucketList l = hashTable[i];
+  { if (st->hashTable[i] != NULL)
+    { BucketList l = st->hashTable[i];
       while (l != NULL)
       { LineList t = l->lines;
         fprintf(listing,"%-14s ",l->name);
