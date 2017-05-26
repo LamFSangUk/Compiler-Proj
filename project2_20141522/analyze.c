@@ -6,7 +6,6 @@
 /* Kenneth C. Louden                                */
 /****************************************************/
 
-#include "globals.h"
 #include "symtab.h"
 #include "analyze.h"
 
@@ -71,7 +70,6 @@ static void insertNode( TreeNode * t)
       { case IdK:
 		case ArrK:
 		case CallK:
-			fprintf(listing,"%s\n",t->attr.name);
 
           if (st_lookup(t->attr.name,1) == -1)
           /* not yet in table, so treat as new definition */
@@ -79,7 +77,7 @@ static void insertNode( TreeNode * t)
           else
           /* already in table, so ignore location, 
              add line number of use only */ 
-            st_insert(t->attr.name,t->lineno,0,1);
+            st_insert(t,0,1);
           break;
         default:
           break;
@@ -93,8 +91,7 @@ static void insertNode( TreeNode * t)
 				/* already in table, so it is an error. */
 					symtabError(t,"Already Declared");
 				else
-					st_insert(t->attr.name,t->lineno,location++,0);
-					fprintf(listing,"%s\n",t->attr.name);
+					st_insert(t,location++,0);
 				break;
 			case FuncK:	
 				
@@ -102,7 +99,7 @@ static void insertNode( TreeNode * t)
 					/* already in table, so it is an error. */
 					symtabError(t,"Already Declared");
 				else{
-					st_insert(t->attr.name,t->lineno,location++,0);
+					st_insert(t,location++,0);
 					funcscope=TRUE;
 					st_scopeup();
 				}
@@ -120,11 +117,9 @@ static void insertNode( TreeNode * t)
 void buildSymtab(TreeNode * syntaxTree)
 { 
 	st_scopeup();	
+	if(TraceAnalyze) fprintf(listing,"\nSymbol table:\n\n");
 	traverse(syntaxTree,insertNode,st_scopedown);
-  if (TraceAnalyze)
-  { fprintf(listing,"\nSymbol table:\n\n");
-    printSymTab(listing);
-  }
+ 	if (TraceAnalyze) printSymTab(listing);
 	//st_scopedown();
 	//printSymTab(listing);
 }

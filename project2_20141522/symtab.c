@@ -50,6 +50,7 @@ typedef struct BucketListRec
    { char * name;
 //	 DclrExpType type;
      LineList lines;
+	 DclrExpType type;
      int memloc ; /* memory location for variable */
      struct BucketListRec * next;
    } * BucketList;
@@ -69,19 +70,20 @@ SymTabList st;
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, int lineno, int loc ,int mode)
+void st_insert( TreeNode * tnode, int loc ,int mode)
 // mpde 0 for just current scope, use it in Dclr
 // mode 1 for all scope, use it in Exp
-{ int h = hash(name);
+{ int h = hash(tnode->attr.name);
 	if(mode==0){
 		BucketList l =  st->hashTable[h];
-		while ((l != NULL) && (strcmp(name,l->name) != 0))
+		while ((l != NULL) && (strcmp(tnode->attr.name,l->name) != 0))
 			l = l->next;
 		if (l == NULL) /* variable not yet in table of current scope */
 		{ l = (BucketList) malloc(sizeof(struct BucketListRec));
-			l->name = name;
+			l->name = tnode->attr.name;
 			l->lines = (LineList) malloc(sizeof(struct LineListRec));
-			l->lines->lineno = lineno;
+			l->lines->lineno = tnode->lineno;
+			l->type=tnode->type;
 			l->memloc = loc;
 			l->lines->next = NULL;
 			l->next = st->hashTable[h];
@@ -90,7 +92,7 @@ void st_insert( char * name, int lineno, int loc ,int mode)
 		{ LineList t = l->lines;
 			while (t->next != NULL) t = t->next;
 			t->next = (LineList) malloc(sizeof(struct LineListRec));
-			t->next->lineno = lineno;
+			t->next->lineno = tnode->lineno;
 			t->next->next = NULL;
 			
 		}
@@ -99,17 +101,19 @@ void st_insert( char * name, int lineno, int loc ,int mode)
 		SymTabList temp=st;
 		while(temp!=NULL){
 			BucketList l = temp->hashTable[h];
-			while((l!=NULL) && (strcmp(name,l->name) !=0))
+			while((l!=NULL) && (strcmp(tnode->attr.name,l->name) !=0))
 				l=l->next;
 			if(l!=NULL){
 				LineList t = l->lines;
-				while(t->next != NULL) t = t->next;
-				if(t->lineno!=lineno){
-					//eleminate the duplicated LineListRec
-					t->next = (LineList) malloc(sizeof(struct LineListRec));
-					t->next->lineno = lineno;
-					t->next->next=NULL;
+				while(t->next != NULL){
+					if(t->lineno == tnode->lineno) return; //eleminate the duplicated LineListRec
+					 t = t->next;
 				}
+				if(t->lineno == tnode->lineno) return;
+				t->next = (LineList) malloc(sizeof(struct LineListRec));
+				t->next->lineno = tnode->lineno;
+				t->next->next=NULL;
+				
 
 				return;
 			}
@@ -158,7 +162,6 @@ void st_scopeup(){
 	for(i=0;i<SIZE;i++) newst->hashTable[i]=NULL;
 
 	st = newst;
-	printf("scopeup %d\n",st->scope_lev);
 }
 
 void st_scopedown(TreeNode* t){
@@ -182,16 +185,19 @@ void st_scopedown(TreeNode* t){
 void printSymTab(FILE * listing)
 { int i;
 	if(TraceAnalyze){
-		fprintf(listing,"Variable Name  Scope  Location   Line Numbers\n");
-		fprintf(listing,"-------------  -----  --------   ------------\n");
+		fprintf(listing,"Variable Name  Scope  Location  Type  Line Numbers\n");
+		fprintf(listing,"-------------  -----  --------  ----  ------------\n");
 		for (i=0;i<SIZE;++i)
 		{ if (st->hashTable[i] != NULL)
 			{ BucketList l = st->hashTable[i];
 				while (l != NULL)
 				{ LineList t = l->lines;
 					fprintf(listing,"%-14s ",l->name);
-					fprintf(listing,"%-5d", st->scope_lev);
+					fprintf(listing,"%-5d  ", st->scope_lev);
 					fprintf(listing,"%-8d  ",l->memloc);
+					if(l->type==Void) fprintf(listing,"void  ");
+					else if(l->type==Integer)fprintf(listing,"int   ");
+					else fprintf(listing,"      ");
 					while (t != NULL)
 					{ fprintf(listing,"%4d ",t->lineno);
 						t = t->next;
