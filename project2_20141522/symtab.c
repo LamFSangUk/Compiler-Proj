@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symtab.h"
+#include "globals.h"
 
 /* SIZE is the size of the hash table */
 #define SIZE 211
@@ -68,27 +69,55 @@ SymTabList st;
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, int lineno, int loc )
+void st_insert( char * name, int lineno, int loc ,int mode)
+// mpde 0 for just current scope, use it in Dclr
+// mode 1 for all scope, use it in Exp
 { int h = hash(name);
-  BucketList l =  st->hashTable[h];
-  while ((l != NULL) && (strcmp(name,l->name) != 0))
-    l = l->next;
-  if (l == NULL) /* variable not yet in table */
-  { l = (BucketList) malloc(sizeof(struct BucketListRec));
-    l->name = name;
-    l->lines = (LineList) malloc(sizeof(struct LineListRec));
-    l->lines->lineno = lineno;
-    l->memloc = loc;
-    l->lines->next = NULL;
-    l->next = st->hashTable[h];
-    st->hashTable[h] = l; }
-  else /* found in table, so just add line number */
-  { LineList t = l->lines;
-    while (t->next != NULL) t = t->next;
-    t->next = (LineList) malloc(sizeof(struct LineListRec));
-    t->next->lineno = lineno;
-    t->next->next = NULL;
-  }
+	if(mode==0){
+		BucketList l =  st->hashTable[h];
+		while ((l != NULL) && (strcmp(name,l->name) != 0))
+			l = l->next;
+		if (l == NULL) /* variable not yet in table of current scope */
+		{ l = (BucketList) malloc(sizeof(struct BucketListRec));
+			l->name = name;
+			l->lines = (LineList) malloc(sizeof(struct LineListRec));
+			l->lines->lineno = lineno;
+			l->memloc = loc;
+			l->lines->next = NULL;
+			l->next = st->hashTable[h];
+			st->hashTable[h] = l; }
+		else /* found in table, so just add line number */
+		{ LineList t = l->lines;
+			while (t->next != NULL) t = t->next;
+			t->next = (LineList) malloc(sizeof(struct LineListRec));
+			t->next->lineno = lineno;
+			t->next->next = NULL;
+			
+		}
+	}
+	else{
+		SymTabList temp=st;
+		while(temp!=NULL){
+			BucketList l = temp->hashTable[h];
+			while((l!=NULL) && (strcmp(name,l->name) !=0))
+				l=l->next;
+			if(l!=NULL){
+				LineList t = l->lines;
+				while(t->next != NULL) t = t->next;
+				if(t->lineno!=lineno){
+					//eleminate the duplicated LineListRec
+					t->next = (LineList) malloc(sizeof(struct LineListRec));
+					t->next->lineno = lineno;
+					t->next->next=NULL;
+				}
+
+				return;
+			}
+
+			temp=temp->next;
+		}
+		//Error Undclr
+	}
 } /* st_insert */
 
 /* Function st_lookup returns the memory 
@@ -132,12 +161,18 @@ void st_scopeup(){
 	printf("scopeup %d\n",st->scope_lev);
 }
 
-void st_scopedown(){
-	if(st){
-		SymTabList temp = st->next;
-		free(st);
-		st=temp;
+void st_scopedown(TreeNode* t){
+	if(t->nodekind==StmtK){
+		if(t->kind.stmt==CompK && st){
+			SymTabList temp = st->next;
+
+			printSymTab(listing);
+
+			free(st);
+			st=temp;
+		}
 	}
+	//else if(t==syntaxTree
 }
 
 /* Procedure printSymTab prints a formatted 
@@ -146,17 +181,16 @@ void st_scopedown(){
  */
 void printSymTab(FILE * listing)
 { int i;
-	SymTabList temp=st;
-	while(temp!=NULL){
+	if(TraceAnalyze){
 		fprintf(listing,"Variable Name  Scope  Location   Line Numbers\n");
 		fprintf(listing,"-------------  -----  --------   ------------\n");
 		for (i=0;i<SIZE;++i)
-		{ if (temp->hashTable[i] != NULL)
-			{ BucketList l = temp->hashTable[i];
+		{ if (st->hashTable[i] != NULL)
+			{ BucketList l = st->hashTable[i];
 				while (l != NULL)
 				{ LineList t = l->lines;
 					fprintf(listing,"%-14s ",l->name);
-					fprintf(listing,"%-5d", temp->scope_lev);
+					fprintf(listing,"%-5d", st->scope_lev);
 					fprintf(listing,"%-8d  ",l->memloc);
 					while (t != NULL)
 					{ fprintf(listing,"%4d ",t->lineno);
@@ -167,7 +201,6 @@ void printSymTab(FILE * listing)
 				}
 			}
 		}
-		temp=temp->next;
 		fprintf(listing,"\n");
 	}
 } /* printSymTab */

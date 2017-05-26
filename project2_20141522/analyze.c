@@ -79,7 +79,7 @@ static void insertNode( TreeNode * t)
           else
           /* already in table, so ignore location, 
              add line number of use only */ 
-            st_insert(t->attr.name,t->lineno,0);
+            st_insert(t->attr.name,t->lineno,0,1);
           break;
         default:
           break;
@@ -93,7 +93,7 @@ static void insertNode( TreeNode * t)
 				/* already in table, so it is an error. */
 					symtabError(t,"Already Declared");
 				else
-					st_insert(t->attr.name,t->lineno,location++);
+					st_insert(t->attr.name,t->lineno,location++,0);
 					fprintf(listing,"%s\n",t->attr.name);
 				break;
 			case FuncK:	
@@ -102,7 +102,7 @@ static void insertNode( TreeNode * t)
 					/* already in table, so it is an error. */
 					symtabError(t,"Already Declared");
 				else{
-					st_insert(t->attr.name,t->lineno,location++);
+					st_insert(t->attr.name,t->lineno,location++,0);
 					funcscope=TRUE;
 					st_scopeup();
 				}
@@ -120,12 +120,13 @@ static void insertNode( TreeNode * t)
 void buildSymtab(TreeNode * syntaxTree)
 { 
 	st_scopeup();	
-	traverse(syntaxTree,insertNode,nullProc);
+	traverse(syntaxTree,insertNode,st_scopedown);
   if (TraceAnalyze)
   { fprintf(listing,"\nSymbol table:\n\n");
     printSymTab(listing);
   }
-	st_scopedown();
+	//st_scopedown();
+	//printSymTab(listing);
 }
 
 static void typeError(TreeNode * t, char * message)
