@@ -48,9 +48,10 @@ typedef struct LineListRec
  */
 typedef struct BucketListRec
    { char * name;
-//	 DclrExpType type;
      LineList lines;
 	 DclrExpType type;
+	 int vpf;
+	 int arrsize;
      int memloc ; /* memory location for variable */
      struct BucketListRec * next;
    } * BucketList;
@@ -83,6 +84,12 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 			l->name = tnode->attr.name;
 			l->lines = (LineList) malloc(sizeof(struct LineListRec));
 			l->lines->lineno = tnode->lineno;
+			if(tnode->kind.dclr==FuncK) l->vpf=2;
+			else{
+				if(tnode->para) l->vpf=1;
+				else l->vpf=0;
+			}
+			l->arrsize=tnode->size;
 			l->type=tnode->type;
 			l->memloc = loc;
 			l->lines->next = NULL;
@@ -185,8 +192,8 @@ void st_scopedown(TreeNode* t){
 void printSymTab(FILE * listing)
 { int i;
 	if(TraceAnalyze){
-		fprintf(listing,"Variable Name  Scope  Location  Type  Line Numbers\n");
-		fprintf(listing,"-------------  -----  --------  ----  ------------\n");
+		fprintf(listing,"Variable Name  Scope  Location  V/P/F  Array?  Size  Type  Line Numbers\n");
+		fprintf(listing,"-------------  -----  --------  -----  ------  ----  ----  ------------\n");
 		for (i=0;i<SIZE;++i)
 		{ if (st->hashTable[i] != NULL)
 			{ BucketList l = st->hashTable[i];
@@ -195,6 +202,14 @@ void printSymTab(FILE * listing)
 					fprintf(listing,"%-14s ",l->name);
 					fprintf(listing,"%-5d  ", st->scope_lev);
 					fprintf(listing,"%-8d  ",l->memloc);
+					
+					if(l->vpf == 2) fprintf(listing,"Func   ");
+					else if(l->vpf==1) fprintf(listing,"Para   ");
+					else fprintf(listing,"Var    ");
+	
+					if(l->arrsize!=-1) fprintf(listing,"TRUE    %-4d  ",l->arrsize);
+					else fprintf(listing,"FALSE   -     ");
+					
 					if(l->type==Void) fprintf(listing,"void  ");
 					else if(l->type==Integer)fprintf(listing,"int   ");
 					else fprintf(listing,"      ");

@@ -128,6 +128,7 @@ param 		: type_spcf ID
 				{ $$ = $3;
 				  $$->lineno = lineno;
 				  $$->type = PopType();
+				  $$->size = 0;
 				  $$->para = TRUE;
 				}
 			;

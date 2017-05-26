@@ -118,7 +118,7 @@ TreeNode * newDclrNode(DclrKind kind)
 		t->kind.dclr = kind;
 		t->lineno = lineno;
 		t->type = Void;
-		t->size = 0;
+		t->size = -1;
 		t->para = FALSE;
 	}
 	return t;

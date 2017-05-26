@@ -10,7 +10,9 @@
 #include "analyze.h"
 
 /* counter for variable memory locations */
-static int location = 0;
+static int location[256] = {0};
+static int func_count=0;
+static int paraloc=0;
 
 /* Procedure traverse is a generic recursive 
  * syntax tree traversal routine:
@@ -58,8 +60,10 @@ static void insertNode( TreeNode * t)
       { case CompK:
 			if(!funcscope)
 				st_scopeup();
-			else 
+			else {
 				funcscope=FALSE;
+				paraloc=0;
+			}
 			break;
         default:
           break;
@@ -85,13 +89,19 @@ static void insertNode( TreeNode * t)
       break;
 	case DclrK:
 		switch(t->kind.dclr){
-			case VarK:
+			int loc;
 			case VarArrK:
+				if(!funcscope) location[func_count]-=4*t->size;
+			case VarK:
+				if(!funcscope) { loc=location[func_count]; location[func_count]-=4; }
+				else { loc=paraloc; paraloc+=4; }
+
 				if(st_lookup(t->attr.name,0)>-1)
 				/* already in table, so it is an error. */
 					symtabError(t,"Already Declared");
 				else
-					st_insert(t,location++,0);
+					st_insert(t,loc,0);
+				
 				break;
 			case FuncK:	
 				
@@ -99,7 +109,8 @@ static void insertNode( TreeNode * t)
 					/* already in table, so it is an error. */
 					symtabError(t,"Already Declared");
 				else{
-					st_insert(t,location++,0);
+					st_insert(t,func_count++,0);
+					location[func_count]=-4*(func_count-1);
 					funcscope=TRUE;
 					st_scopeup();
 				}
