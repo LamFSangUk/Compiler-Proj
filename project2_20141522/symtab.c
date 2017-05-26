@@ -146,22 +146,28 @@ void st_scopedown(){
  */
 void printSymTab(FILE * listing)
 { int i;
-  fprintf(listing,"Variable Name  Location   Line Numbers\n");
-  fprintf(listing,"-------------  --------   ------------\n");
-  for (i=0;i<SIZE;++i)
-  { if (st->hashTable[i] != NULL)
-    { BucketList l = st->hashTable[i];
-      while (l != NULL)
-      { LineList t = l->lines;
-        fprintf(listing,"%-14s ",l->name);
-        fprintf(listing,"%-8d  ",l->memloc);
-        while (t != NULL)
-        { fprintf(listing,"%4d ",t->lineno);
-          t = t->next;
-        }
-        fprintf(listing,"\n");
-        l = l->next;
-      }
-    }
-  }
+	SymTabList temp=st;
+	while(temp!=NULL){
+		fprintf(listing,"Variable Name  Scope  Location   Line Numbers\n");
+		fprintf(listing,"-------------  -----  --------   ------------\n");
+		for (i=0;i<SIZE;++i)
+		{ if (temp->hashTable[i] != NULL)
+			{ BucketList l = temp->hashTable[i];
+				while (l != NULL)
+				{ LineList t = l->lines;
+					fprintf(listing,"%-14s ",l->name);
+					fprintf(listing,"%-5d", temp->scope_lev);
+					fprintf(listing,"%-8d  ",l->memloc);
+					while (t != NULL)
+					{ fprintf(listing,"%4d ",t->lineno);
+						t = t->next;
+					}
+					fprintf(listing,"\n");
+					l = l->next;
+				}
+			}
+		}
+		temp=temp->next;
+		fprintf(listing,"\n");
+	}
 } /* printSymTab */
