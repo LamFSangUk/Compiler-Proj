@@ -85,7 +85,7 @@ main(int argc, char * argv[])
 		fprintf(listing, "\nBuilding Symbol Table...\n");
 		buildSymtab(syntaxTree);
 		fprintf(listing, "\nChecking Types...\n");
-		//typeCheck(syntaxTree);
+		typeCheck(syntaxTree);
 		fprintf(listing, "\Type Checking Finished\n");
 	}
 #if !NO_CODE

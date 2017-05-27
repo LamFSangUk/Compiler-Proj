@@ -35,7 +35,7 @@ static void traverse( TreeNode * t,
 
 static void symtabError(TreeNode * t, char * msg)
 {
-	fprintf(listing,"Symbol error at line %d: %s\n",t->lineno, msg);
+	fprintf(listing,"Symbol error at line %d: %s %s\n",t->lineno, msg,t->attr.name);
 	Error = TRUE;
 }
 
@@ -98,7 +98,7 @@ static void insertNode( TreeNode * t)
 
 				if(st_lookup(t->attr.name,0)>-1)
 				/* already in table, so it is an error. */
-					symtabError(t,"Already Declared");
+					symtabError(t,"Already Declared Symbol ");
 				else
 					st_insert(t,loc,0);
 				
@@ -107,7 +107,7 @@ static void insertNode( TreeNode * t)
 				
 				if(st_lookup(t->attr.name,0)>-1)
 					/* already in table, so it is an error. */
-					symtabError(t,"Already Declared");
+					symtabError(t,"Already Declared Function ");
 				else{
 					st_insert(t,func_count++,0);
 					location[func_count]=-4*(func_count-1);
@@ -144,7 +144,7 @@ static void typeError(TreeNode * t, char * message)
  * type checking at a single tree node
  */
 static void checkNode(TreeNode * t)
-{ /*switch (t->nodekind)
+{ switch (t->nodekind)
   { case ExpK:
       switch (t->kind.exp)
       { case OpK:
@@ -189,7 +189,7 @@ static void checkNode(TreeNode * t)
     default:
       break;
 
-  }*/
+  }
 }
 
 /* Procedure typeCheck performs type checking 
