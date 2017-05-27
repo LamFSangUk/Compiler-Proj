@@ -147,8 +147,24 @@ static void checkNode(TreeNode * t)
 { switch (t->nodekind)
   { case ExpK:
       switch (t->kind.exp)
-      { /*case OpK:
-          if ((t->child[0]->type != Integer) ||
+      { case OpK:
+			//Check For Left Child
+			if(t->child[0]->type == Void){
+				typeError(t,"Operand1 expected Integer, but actual was Void");
+				break;
+			}
+			//Check for Right Child
+			if(t->child[1]->type == Void){
+				typeError(t,"Operand2 expected Integer, but actual was Void");
+				break;
+			}
+			//Assigh check for same type
+			if(t->child[0]->type != t->child[1]->type)
+				//Actually No need in Cminus, cause all type of var to operate is integer
+				typeError(t,"Operator ERROR: different type");
+			t->type=t->child[0]->type;
+			break;
+			/*	if ((t->child[0]->type != Integer) ||
               (t->child[1]->type != Integer))
             typeError(t,"Op applied to non-integer");
           if ((t->attr.op == EQ) || (t->attr.op == LT))
@@ -160,9 +176,10 @@ static void checkNode(TreeNode * t)
         case IdK:
           t->type = Integer;
           break;
+*/
         default:
           break;
-		*/
+		
       }
       break;
     case StmtK:
@@ -196,7 +213,14 @@ static void checkNode(TreeNode * t)
 					typeError(t,"Cannot Declare VOID Type Variable");
 				}
 				break;
-			case FuncK:	
+			case FuncK:
+				if(strcmp(t->attr.name,"main")==0){
+					//Error for main
+					if(t->type!=Void){
+						typeError(t,"main function should have void type");
+					}
+				}	
+				break;
 			default:
 				break;
 		}
