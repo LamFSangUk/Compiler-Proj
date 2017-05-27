@@ -13,5 +13,5 @@
 - [ ] 함수의 return type이 void일 경우 return이 없어야 함
 - [ ] main함수는 가장 마지막에 선언되어야 함
 - [x] main함수는 반드시 void로 선언되어야 함
-- [ ] main함수는 반드시 parameter가 존재하지 않는다.
+- [x] main함수는 반드시 parameter가 존재하지 않는다.
 - [ ] loop문의 반복 조건을 표시하는 부분에 오는 statement는 int값을 가질 수 있어야 한다.

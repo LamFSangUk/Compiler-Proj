@@ -5,7 +5,7 @@ void func(void){
 	return a;
 }
 int funb(int c){
- 	c=1;
+ 	c = 1;
 }
 int main(void){
 	func(); funb(1);

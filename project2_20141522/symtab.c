@@ -110,7 +110,7 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 			BucketList l = temp->hashTable[h];
 			while((l!=NULL) && (strcmp(tnode->attr.name,l->name) !=0))
 				l=l->next;
-			if(l!=NULL){
+			if(l!=NULL){//found
 				LineList t = l->lines;
 				while(t->next != NULL){
 					if(t->lineno == tnode->lineno) return; //eleminate the duplicated LineListRec
@@ -121,6 +121,7 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 				t->next->lineno = tnode->lineno;
 				t->next->next=NULL;
 				
+				tnode->type=l->type;
 
 				return;
 			}

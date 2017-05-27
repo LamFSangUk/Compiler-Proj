@@ -1,6 +1,5 @@
 /* error9
 		invalid type in additive, multiplcative expression */
-
 void funa(void){
 	;
 }

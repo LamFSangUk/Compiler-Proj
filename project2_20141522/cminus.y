@@ -291,6 +291,7 @@ factor		: LPAREN exp RPAREN { $$ = $2; }
 			| NUM
 				{ $$ = newExpNode(ConstK);
 				  $$->attr.val = savedNum;
+				  $$->type = Integer;
 				}
 			;
 call		: ID 

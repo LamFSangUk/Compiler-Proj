@@ -37,6 +37,7 @@ static void symtabError(TreeNode * t, char * msg)
 {
 	fprintf(listing,"Symbol error at line %d: %s %s\n",t->lineno, msg,t->attr.name);
 	Error = TRUE;
+	exit(0);
 }
 
 /* nullProc is a do-nothing procedure to 
@@ -138,6 +139,7 @@ void buildSymtab(TreeNode * syntaxTree)
 static void typeError(TreeNode * t, char * message)
 { fprintf(listing,"Type error at line %d: %s\n",t->lineno,message);
   Error = TRUE;
+	exit(0);
 }
 
 /* Procedure checkNode performs
@@ -150,7 +152,7 @@ static void checkNode(TreeNode * t)
       { case OpK:
 			//Check For Left Child
 			if(t->child[0]->type == Void){
-				typeError(t,"Operand1 expected Integer, but actual was Void");
+				//typeError(t,"Operand1 expected Integer, but actual was Void");
 				break;
 			}
 			//Check for Right Child
@@ -163,6 +165,16 @@ static void checkNode(TreeNode * t)
 				//Actually No need in Cminus, cause all type of var to operate is integer
 				typeError(t,"Operator ERROR: different type");
 			t->type=t->child[0]->type;
+			break;
+		case IdK:
+			break;
+		case ArrK:
+			//Check For Array Idx
+			if(!t->child[0] || t->child[0]->type!=Integer){
+				typeError(t,"invalid subscript of array\n\t\texpected int but actual was void");
+				break;
+			}
+		case CallK:
 			break;
 			/*	if ((t->child[0]->type != Integer) ||
               (t->child[1]->type != Integer))
@@ -211,6 +223,9 @@ static void checkNode(TreeNode * t)
 			case VarArrK:
 				if(t->type==Void){//Cannot declare VOID type var
 					typeError(t,"Cannot Declare VOID Type Variable");
+				}
+				if(t->para!=0 && strcmp(t->attr.name,"main")==0){
+					typeError(t,"main function cannot have parameters");
 				}
 				break;
 			case FuncK:
