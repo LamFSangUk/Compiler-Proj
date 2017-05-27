@@ -2,7 +2,7 @@
 
 - [x] 선언되지 않은 변수나 함수는 사용 불가
 - [x] 변수나 함수, 함수 파라미터 선언 시 중복된 이름 check
-- [ ] 변수나 parameter 선언 시 void type으로 선언할 수 없음.
+- [x] 변수나 parameter 선언 시 void type으로 선언할 수 없음.
 - [x] 변수나 parameter 선언 시 array 변수인지 확인해야 함.
 - [ ] 변수에 값을 assign 하는 경우 type에 대한 check
 - [ ] 변수가 array인 경우 array index가 int가 아닌 경우

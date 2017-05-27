@@ -147,7 +147,7 @@ static void checkNode(TreeNode * t)
 { switch (t->nodekind)
   { case ExpK:
       switch (t->kind.exp)
-      { case OpK:
+      { /*case OpK:
           if ((t->child[0]->type != Integer) ||
               (t->child[1]->type != Integer))
             typeError(t,"Op applied to non-integer");
@@ -162,11 +162,12 @@ static void checkNode(TreeNode * t)
           break;
         default:
           break;
+		*/
       }
       break;
     case StmtK:
       switch (t->kind.stmt)
-      { case IfK:
+      { /*case IfK:
           if (t->child[0]->type == Integer)
             typeError(t->child[0],"if test is not Boolean");
           break;
@@ -183,7 +184,7 @@ static void checkNode(TreeNode * t)
             typeError(t->child[1],"repeat test is not Boolean");
           break;
         default:
-          break;
+          break;*/
       }
       break;
 	case DclrK:
@@ -191,8 +192,11 @@ static void checkNode(TreeNode * t)
 		{
 			case VarK:
 			case VarArrK:
-			case FuncK:
-				
+				if(t->type==Void){//Cannot declare VOID type var
+					typeError(t,"Cannot Declare VOID Type Variable");
+				}
+				break;
+			case FuncK:	
 			default:
 				break;
 		}
