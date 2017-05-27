@@ -186,6 +186,17 @@ static void checkNode(TreeNode * t)
           break;
       }
       break;
+	case DclrK:
+		switch (t->kind.dclr)
+		{
+			case VarK:
+			case VarArrK:
+			case FuncK:
+				
+			default:
+				break;
+		}
+		break;
     default:
       break;
 
