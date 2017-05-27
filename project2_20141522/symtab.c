@@ -14,13 +14,6 @@
 #include "symtab.h"
 #include "globals.h"
 
-/* SIZE is the size of the hash table */
-#define SIZE 211
-
-/* SHIFT is the power of two used as multiplier
-   in hash function  */
-#define SHIFT 4
-
 /* the hash function */
 static int hash ( char * key )
 { int temp = 0;
@@ -31,40 +24,6 @@ static int hash ( char * key )
   }
   return temp;
 }
-
-/* the list of line numbers of the source 
- * code in which a variable is referenced
- */
-typedef struct LineListRec
-   { int lineno;
-     struct LineListRec * next;
-   } * LineList;
-
-/* The record in the bucket lists for
- * each variable, including name, 
- * assigned memory location, and
- * the list of line numbers in which
- * it appears in the source code
- */
-typedef struct BucketListRec
-   { char * name;
-     LineList lines;
-	 DclrExpType type;
-	 int vpf;
-	 int arrsize;
-     int memloc ; /* memory location for variable */
-     struct BucketListRec * next;
-   } * BucketList;
-
-/* the hash table */
-//static BucketList hashTable[SIZE];
-typedef struct SymbolTableList{
-	BucketList hashTable[SIZE];
-	int scope_lev;
-	struct SymbolTableList * next;
-}*SymTabList;
-
-SymTabList st;
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
@@ -112,6 +71,9 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 				l=l->next;
 			if(l!=NULL){//found
 				LineList t = l->lines;
+				
+				tnode->type=l->type;
+
 				while(t->next != NULL){
 					if(t->lineno == tnode->lineno) return; //eleminate the duplicated LineListRec
 					 t = t->next;
@@ -121,8 +83,6 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 				t->next->lineno = tnode->lineno;
 				t->next->next=NULL;
 				
-				tnode->type=l->type;
-
 				return;
 			}
 
@@ -132,10 +92,10 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 	}
 } /* st_insert */
 
-/* Function st_lookup returns the memory 
- * location of a variable or -1 if not found
+/* Function st_lookup returns Bucket of symtab
+ * location of a variable or NULL if not found
  */
-int st_lookup ( char * name, int mode)
+BucketList st_lookup ( char * name, int mode)
 // mpde 0 for just current scope
 // mode 1 for all scope
 { int h = hash(name);
@@ -145,12 +105,12 @@ int st_lookup ( char * name, int mode)
  		while ((l != NULL) && (strcmp(name,l->name) != 0))
     		l = l->next;
   		if (l == NULL) {
-			if(mode==0) return -1;
+			if(mode==0) return NULL;//No exist in cur scope. Err
 			else temp=temp->next;
 		}
-  		else return l->memloc;
+  		else return l;
 	}
-	return -1;
+	return NULL;
 }
 
 void st_scopeup(){

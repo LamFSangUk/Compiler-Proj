@@ -11,7 +11,7 @@ int func(int parA[], int parB){
 	i=0;
 	while(parB==0){
 		int wvar;
-		parA[i] = parB*func(parA,i)*(parA[i]+parA[i+1]/parB);
+		parA[i] = parB*func(parA,i)*(parA[i]+parA[i]/parB);
 		parB=parB-1;
 		i=i+1;
 		if(parB = parA[12])

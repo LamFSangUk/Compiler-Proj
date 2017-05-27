@@ -5,7 +5,7 @@
 - [x] 변수나 parameter 선언 시 void type으로 선언할 수 없음.
 - [x] 변수나 parameter 선언 시 array 변수인지 확인해야 함.
 - [x] 변수에 값을 assign 하는 경우 type에 대한 check
-- [ ] 변수가 array인 경우 array index가 int가 아닌 경우
+- [x] 변수가 array인 경우 array index가 int가 아닌 경우
 - [ ] array가 아닌 변수를 array처럼 사용하려 하는 경우
 - [ ] 함수 호출 시 parameter의 개수와 type이 일치하는지 check
 - [ ] 함수 호출 시 호출된 것이 함수가 맞는지 (즉 변수 등이 아니었는지) 확인해야

@@ -76,7 +76,7 @@ static void insertNode( TreeNode * t)
 		case ArrK:
 		case CallK:
 
-          if (st_lookup(t->attr.name,1) == -1)
+          if (!st_lookup(t->attr.name,1))
           /* not yet in table, so treat as new definition */
             symtabError(t,"Undeclared Symbol");
           else
@@ -97,7 +97,7 @@ static void insertNode( TreeNode * t)
 				if(!funcscope) { loc=location[func_count]; location[func_count]-=4; }
 				else { loc=paraloc; paraloc+=4; }
 
-				if(st_lookup(t->attr.name,0)>-1)
+				if(st_lookup(t->attr.name,0))
 				/* already in table, so it is an error. */
 					symtabError(t,"Already Declared Symbol ");
 				else
@@ -106,7 +106,7 @@ static void insertNode( TreeNode * t)
 				break;
 			case FuncK:	
 				
-				if(st_lookup(t->attr.name,0)>-1)
+				if(st_lookup(t->attr.name,0))
 					/* already in table, so it is an error. */
 					symtabError(t,"Already Declared Function ");
 				else{
@@ -139,7 +139,19 @@ void buildSymtab(TreeNode * syntaxTree)
 static void typeError(TreeNode * t, char * message)
 { fprintf(listing,"Type error at line %d: %s\n",t->lineno,message);
   Error = TRUE;
-	exit(0);
+}
+
+static char getOperator(int token){
+	char c;
+	switch(token){
+		case PLUS:	c='+';break;
+		case MINUS: c='-';break;
+		case TIMES: c='*';break;
+		case OVER:	c='/';break;
+		default:
+			break;
+	}
+	return c;
 }
 
 /* Procedure checkNode performs
@@ -149,10 +161,14 @@ static void checkNode(TreeNode * t)
 { switch (t->nodekind)
   { case ExpK:
       switch (t->kind.exp)
-      { case OpK:
+      { char op;
+		case OpK:
+			op=getOperator(t->attr.op);	
+
 			//Check For Left Child
 			if(t->child[0]->type == Void){
-				//typeError(t,"Operand1 expected Integer, but actual was Void");
+				typeError(t,"Operand1 expected Integer, but actual was Void");
+				fprintf(listing,"\t\t\tExp: %s %c %s\n",t->child[0]->attr.name,op,t->child[1]->attr.name);
 				break;
 			}
 			//Check for Right Child
@@ -171,6 +187,8 @@ static void checkNode(TreeNode * t)
 		case ArrK:
 			//Check For Array Idx
 			if(!t->child[0] || t->child[0]->type!=Integer){
+				printf("%s\n",t->child[0]->attr.name);
+				printf("%d",t->child[0]->type);	
 				typeError(t,"invalid subscript of array\n\t\texpected int but actual was void");
 				break;
 			}
