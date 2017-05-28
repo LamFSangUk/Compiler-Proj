@@ -45,7 +45,12 @@ typedef struct BucketListRec
 typedef struct SymbolTableList{
         BucketList hashTable[SIZE];
         int scope_lev;
+		//Point to Parent or Child
+		struct SymbolTableList * up;
+		struct SymbolTableList * down;
+		//Point to Siblings
         struct SymbolTableList * next;
+		struct SymbolTableList * prev;
 }*SymTabList;
 
 SymTabList st;

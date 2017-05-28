@@ -136,6 +136,7 @@ void buildSymtab(TreeNode * syntaxTree)
  	if (TraceAnalyze) printSymTab(listing);
 	//st_scopedown();
 	//printSymTab(listing);
+	printf("stlev=%d,st_downlev=%d\n",st->scope_lev,st->down->scope_lev);
 }
 
 static void typeError(TreeNode * t, char * message)
@@ -187,6 +188,10 @@ static void checkNode(TreeNode * t)
 			t->type=t->child[0]->type;
 			break;
 		case IdK:
+			l=st_lookup(t->attr.name,1);
+			if(l==NULL){
+				printf("%s Val %d\n",t->attr.name,t->lineno);
+			}
 			break;
 		case ArrK:
 			//Check for Array or Var
@@ -229,7 +234,15 @@ static void checkNode(TreeNode * t)
       break;
     case StmtK:
       switch (t->kind.stmt)
-      { /*case IfK:
+      { 
+		case CompK:
+			printf("[%d to %d]\n",st->scope_lev,st->up->scope_lev);
+			if(st->next) st->up->down=st->next;
+			st=st->up;
+			break;
+		default:
+			break;
+		/*case IfK:
           if (t->child[0]->type == Integer)
             typeError(t->child[0],"if test is not Boolean");
           break;
@@ -282,6 +295,11 @@ static void checkNode(TreeNode * t)
 /* Procedure typeCheck performs type checking 
  * by a postorder syntax tree traversal
  */
+static void FindScope(TreeNode *t){
+	if(t->nodekind==StmtK && t->kind.stmt==CompK) 
+		if(st->down){printf("[%d to %d]\n",st->scope_lev,st->down->scope_lev);st=st->down;}
+}
+
 void typeCheck(TreeNode * syntaxTree)
-{ traverse(syntaxTree,nullProc,checkNode);
+{ traverse(syntaxTree,FindScope,checkNode);
 }
