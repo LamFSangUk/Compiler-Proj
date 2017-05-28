@@ -91,6 +91,8 @@ typedef struct treeNode
      DclrExpType type; /* for type checking of exps and dclrs */
    } TreeNode;
 
+typedef enum {Var, Para, Func} IdType;
+
 /**************************************************/
 /***********   Flags for tracing       ************/
 /**************************************************/

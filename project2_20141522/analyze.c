@@ -142,6 +142,7 @@ void buildSymtab(TreeNode * syntaxTree)
 static void typeError(TreeNode * t, char * message)
 { fprintf(listing,"Type error at line %d: %s\n",t->lineno,message);
   Error = TRUE;
+	exit(0);
 }
 
 static char getOperator(int token){
@@ -172,34 +173,30 @@ static void checkNode(TreeNode * t)
 			//Check For Left Child
 			if(t->child[0]->type == Void){
 				typeError(t,"Operand1 expected Integer, but actual was Void");
-				fprintf(listing,"\t\t\tExp: %s %c %s\n",t->child[0]->attr.name,op,t->child[1]->attr.name);
+				//fprintf(listing,"\t\t\tExp: %s %c %s\n",t->child[0]->attr.name,op,t->child[1]->attr.name);
 				break;
 			}
 			//Check for Right Child
 			if(t->child[1]->type == Void){
 				typeError(t,"Operand2 expected Integer, but actual was Void");				
-				fprintf(listing,"\t\t\tExp: %s %c %s\n",t->child[0]->attr.name,op,t->child[1]->attr.name);
+				//fprintf(listing,"\t\t\tExp: %s %c %s\n",t->child[0]->attr.name,op,t->child[1]->attr.name);
 				break;
 			}
 			//Assigh check for same type
-			if(t->child[0]->type != t->child[1]->type)
+			if(t->child[0]->type != t->child[1]->type){
 				//Actually No need in Cminus, cause all type of var to operate is integer
 				typeError(t,"Operator ERROR: different type");
+				break;
+			}
 			t->type=t->child[0]->type;
 			break;
 		case IdK:
 			l=st_lookup(t->attr.name,1);
-			if(l==NULL){
-				printf("%s Val %d\n",t->attr.name,t->lineno);
-			}
 			break;
 		case ArrK:
 			//Check for Array or Var
 			l=st_lookup(t->attr.name,1);
-			if(l==NULL){
-				printf("%s %d\n",t->attr.name,t->lineno);
-			}
-			if(l && l->arrsize==-1){
+			if(l->arrsize==-1){
 				typeError(t,"Symbol is not Array");
 				break;
 			}
@@ -213,6 +210,12 @@ static void checkNode(TreeNode * t)
 			}
 			break;
 		case CallK:
+			//Is it function?
+			l=st_lookup(t->attr.name,1);
+			if(l->vpf!=Func){
+				typeError(t,"Symbol is not Function");
+				break;
+			}
 			break;
 			/*	if ((t->child[0]->type != Integer) ||
               (t->child[1]->type != Integer))

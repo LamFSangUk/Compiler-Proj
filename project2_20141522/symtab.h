@@ -36,7 +36,7 @@ typedef struct BucketListRec
    { char * name;
      LineList lines;
          DclrExpType type;
-         int vpf;
+         IdType vpf;
          int arrsize;
      int memloc ; /* memory location for variable */
      struct BucketListRec * next;
