@@ -158,6 +158,11 @@ static char getOperator(int token){
 	return c;
 }
 
+static int return_flag=0;
+static int final_flag=0;
+static TreeNode * returnNode=NULL;
+static TreeNode * paralist=NULL;
+static TreeNode * arglist=NULL;
 /* Procedure checkNode performs
  * type checking at a single tree node
  */
@@ -203,8 +208,6 @@ static void checkNode(TreeNode * t)
 
 			//Check For Array Idx
 			if(!t->child[0] || t->child[0]->type!=Integer){
-				printf("%s\n",t->child[0]->attr.name);
-				printf("%d",t->child[0]->type);	
 				typeError(t,"invalid subscript of array\n\t\t\texpected int but actual was void");
 				break;
 			}
@@ -216,20 +219,26 @@ static void checkNode(TreeNode * t)
 				typeError(t,"Symbol is not Function");
 				break;
 			}
+			paralist=l->paranode;
+			arglist=t->child[0];
+			while(paralist){
+				if(!arglist){
+					typeError(t,"The num of parameter is different");
+					break;
+				}
+
+				if(paralist->type != arglist->type){
+					typeError(t,"parameter doesn't match type");
+					break;
+				}
+				arglist=arglist->sibling;
+				paralist=paralist->sibling;
+			}
+			if(arglist){
+				typeError(t,"The num of parameter is different");
+				break;
+			}
 			break;
-			/*	if ((t->child[0]->type != Integer) ||
-              (t->child[1]->type != Integer))
-            typeError(t,"Op applied to non-integer");
-          if ((t->attr.op == EQ) || (t->attr.op == LT))
-            t->type = Boolean;
-          else
-            t->type = Integer;
-          break;
-        case ConstK:
-        case IdK:
-          t->type = Integer;
-          break;
-*/
         default:
           break;
 		
@@ -243,35 +252,28 @@ static void checkNode(TreeNode * t)
 			if(st->next) st->up->down=st->next;
 			st=st->up;
 			break;
+		case ReturnK:
+			return_flag=1;
+			returnNode=t;
+			if(t->child[0]) t->type=t->child[0]->type;
+			else t->type=Void;
+			break;
 		default:
 			break;
-		/*case IfK:
-          if (t->child[0]->type == Integer)
-            typeError(t->child[0],"if test is not Boolean");
-          break;
-        case AssignK:
-          if (t->child[0]->type != Integer)
-            typeError(t->child[0],"assignment of non-integer value");
-          break;
-        case WriteK:
-          if (t->child[0]->type != Integer)
-            typeError(t->child[0],"write of non-integer value");
-          break;
-        case RepeatK:
-          if (t->child[1]->type == Integer)
-            typeError(t->child[1],"repeat test is not Boolean");
-          break;
-        default:
-          break;*/
       }
       break;
 	case DclrK:
+		if(final_flag){
+			typeError(t,"main function should be the last declaration");
+			break;
+		}
 		switch (t->kind.dclr)
 		{
 			case VarK:
 			case VarArrK:
-				if(t->type==Void){//Cannot declare VOID type var
+					if(t->type==Void){//Cannot declare VOID type var
 					typeError(t,"Cannot Declare VOID Type Variable");
+					break;
 				}
 				/*if(t->para!=0 && strcmp(t->attr.name,"main")==0){
 					typeError(t,"main function cannot have parameters");
@@ -279,11 +281,28 @@ static void checkNode(TreeNode * t)
 				break;
 			case FuncK:
 				if(strcmp(t->attr.name,"main")==0){
+					final_flag=1;
 					//Error for main
 					if(t->type!=Void){
 						typeError(t,"main function should have void type");
+						break;
 					}
-				}	
+				}
+
+				if(return_flag==1){
+					if(t->type!=returnNode->type){
+						typeError(t,"Expected Same Type betwwen Func and Return, but actual was different");
+						break;
+					}
+				}
+				else{
+					if(t->type!=Void){
+						typeError(t,"Expected Return, but actual didn't exist");
+						break;
+					}
+				}
+				returnNode=NULL;
+				return_flag=0;	
 				break;
 			default:
 				break;

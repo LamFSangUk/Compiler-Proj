@@ -37,7 +37,8 @@ typedef struct BucketListRec
      LineList lines;
          DclrExpType type;
          IdType vpf;
-         int arrsize;
+		 int arrsize;
+		 TreeNode * paranode;
      int memloc ; /* memory location for variable */
      struct BucketListRec * next;
    } * BucketList;

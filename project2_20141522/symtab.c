@@ -43,8 +43,12 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 			l->name = tnode->attr.name;
 			l->lines = (LineList) malloc(sizeof(struct LineListRec));
 			l->lines->lineno = tnode->lineno;
-			if(tnode->kind.dclr==FuncK) l->vpf=Func;
+			if(tnode->kind.dclr==FuncK){
+				l->vpf=Func;
+				l->paranode=tnode->child[0];
+			}
 			else{
+				l->paranode=NULL;
 				if(tnode->para) l->vpf=Para;
 				else l->vpf=Var;
 			}
