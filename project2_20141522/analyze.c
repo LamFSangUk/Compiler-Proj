@@ -100,8 +100,10 @@ static void insertNode( TreeNode * t)
 				if(st_lookup(t->attr.name,0))
 				/* already in table, so it is an error. */
 					symtabError(t,"Already Declared Symbol ");
-				else
+				else{
 					st_insert(t,loc,0);
+					printf("lev:%s %d\n",t->attr.name,st->scope_lev);
+				}
 				
 				break;
 			case FuncK:	
@@ -162,6 +164,7 @@ static void checkNode(TreeNode * t)
   { case ExpK:
       switch (t->kind.exp)
       { char op;
+		BucketList l;
 		case OpK:
 			op=getOperator(t->attr.op);	
 
@@ -173,7 +176,8 @@ static void checkNode(TreeNode * t)
 			}
 			//Check for Right Child
 			if(t->child[1]->type == Void){
-				typeError(t,"Operand2 expected Integer, but actual was Void");
+				typeError(t,"Operand2 expected Integer, but actual was Void");				
+				fprintf(listing,"\t\t\tExp: %s %c %s\n",t->child[0]->attr.name,op,t->child[1]->attr.name);
 				break;
 			}
 			//Assigh check for same type
@@ -185,13 +189,24 @@ static void checkNode(TreeNode * t)
 		case IdK:
 			break;
 		case ArrK:
+			//Check for Array or Var
+			l=st_lookup(t->attr.name,1);
+			if(l==NULL){
+				printf("%s %d\n",t->attr.name,t->lineno);
+			}
+			if(l && l->arrsize==-1){
+				typeError(t,"Symbol is not Array");
+				break;
+			}
+
 			//Check For Array Idx
 			if(!t->child[0] || t->child[0]->type!=Integer){
 				printf("%s\n",t->child[0]->attr.name);
 				printf("%d",t->child[0]->type);	
-				typeError(t,"invalid subscript of array\n\t\texpected int but actual was void");
+				typeError(t,"invalid subscript of array\n\t\t\texpected int but actual was void");
 				break;
 			}
+			break;
 		case CallK:
 			break;
 			/*	if ((t->child[0]->type != Integer) ||
@@ -242,9 +257,9 @@ static void checkNode(TreeNode * t)
 				if(t->type==Void){//Cannot declare VOID type var
 					typeError(t,"Cannot Declare VOID Type Variable");
 				}
-				if(t->para!=0 && strcmp(t->attr.name,"main")==0){
+				/*if(t->para!=0 && strcmp(t->attr.name,"main")==0){
 					typeError(t,"main function cannot have parameters");
-				}
+				}*/
 				break;
 			case FuncK:
 				if(strcmp(t->attr.name,"main")==0){

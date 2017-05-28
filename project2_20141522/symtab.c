@@ -105,6 +105,7 @@ BucketList st_lookup ( char * name, int mode)
  		while ((l != NULL) && (strcmp(name,l->name) != 0))
     		l = l->next;
   		if (l == NULL) {
+			printf("stloopuplev:%d\n",temp->scope_lev);
 			if(mode==0) return NULL;//No exist in cur scope. Err
 			else temp=temp->next;
 		}
