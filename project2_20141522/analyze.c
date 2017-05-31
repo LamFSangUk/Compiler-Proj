@@ -136,7 +136,7 @@ void buildSymtab(TreeNode * syntaxTree)
 }
 
 static void typeError(TreeNode * t, char * message)
-{ fprintf(listing,"Type error at line %d: %s\n",t->lineno,message);
+{ fprintf(listing,"Type error\tat line %d: %s\n",t->lineno,message);
   Error = TRUE;
 }
 
@@ -192,6 +192,13 @@ static void checkNode(TreeNode * t)
 			break;
 		case IdK:
 			l=st_lookup(t->attr.name,1);
+			
+			//Check it exists.
+			if(l==NULL){
+				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Symbol",t->attr.name);
+				Error=TRUE;
+			}
+
 			break;
 		case ArrK:
 			//Check for Array or Var
