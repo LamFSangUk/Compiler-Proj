@@ -132,10 +132,7 @@ void buildSymtab(TreeNode * syntaxTree)
 	st_scopeup();	
 	if(TraceAnalyze) fprintf(listing,"\nSymbol table:\n\n");
 	traverse(syntaxTree,insertNode,st_scopedown);
- 	if (TraceAnalyze) printSymTab(listing);
-	//st_scopedown();
-	//printSymTab(listing);
-	printf("stlev=%d,st_downlev=%d\n",st->scope_lev,st->down->scope_lev);
+ 	printSymTab(listing);
 }
 
 static void typeError(TreeNode * t, char * message)
@@ -246,7 +243,6 @@ static void checkNode(TreeNode * t)
       switch (t->kind.stmt)
       { 
 		case CompK:
-			printf("[%d to %d]\n",st->scope_lev,st->up->scope_lev);
 			if(st->next) st->up->down=st->next;
 			st=st->up;
 			break;
@@ -317,7 +313,7 @@ static void checkNode(TreeNode * t)
  */
 static void FindScope(TreeNode *t){
 	if(t->nodekind==StmtK && t->kind.stmt==CompK) 
-		if(st->down){printf("[%d to %d]\n",st->scope_lev,st->down->scope_lev);st=st->down;}
+		if(st->down) st=st->down;
 }
 
 void typeCheck(TreeNode * syntaxTree)
