@@ -197,12 +197,24 @@ static void checkNode(TreeNode * t)
 			if(l==NULL){
 				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Variable",t->attr.name);
 				Error=TRUE;
+				break;
+			}
+			if(l->arrsize>-1){
+				fprintf(listing,"Type error\tat line %d: Symbol %s is Array\n",t->lineno,t->attr.name);
+				Error=TRUE;
 			}
 
 			break;
 		case ArrK:
 			//Check for Array or Var
 			l=st_lookup(t->attr.name,1);
+			//check it exists
+			if(l==NULL){
+				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Array",t->attr.name);
+				Error=TRUE;
+				break;
+			}			
+
 			if(l->arrsize==-1){
 				typeError(t,"Symbol is not Array");
 				break;
@@ -220,7 +232,7 @@ static void checkNode(TreeNode * t)
 			
 			//Check it exists.
 			if(l==NULL){
-				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t-lineno,"Undeclared Function",t->attr.name);
+				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Function",t->attr.name);
 				Error=TRUE;
 				break;
 			}
