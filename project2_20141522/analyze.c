@@ -37,7 +37,6 @@ static void symtabError(TreeNode * t, char * msg)
 {
 	fprintf(listing,"Symbol error at line %d: %s %s\n",t->lineno, msg,t->attr.name);
 	Error = TRUE;
-	exit(0);
 }
 
 /* nullProc is a do-nothing procedure to 
@@ -142,7 +141,6 @@ void buildSymtab(TreeNode * syntaxTree)
 static void typeError(TreeNode * t, char * message)
 { fprintf(listing,"Type error at line %d: %s\n",t->lineno,message);
   Error = TRUE;
-	exit(0);
 }
 
 static char getOperator(int token){
