@@ -124,12 +124,10 @@ void st_scopeup(){
 	if(st){
 		newst->scope_lev = st->scope_lev+1;
 		newst->up = st;
-		//newst->prev = NULL;
 		if(st->down) {
 			SymTabList temp=st->down;
 			while(temp->next) temp=temp->next;
 			temp->next = newst;
-			//newst->prev = st->down;
 		}
 		else st->down = newst;
 	}
@@ -148,11 +146,6 @@ void st_scopedown(TreeNode* t){
 	if(t->nodekind==StmtK){
 		if(t->kind.stmt==CompK && st){
 			printSymTab(listing);
-			//while(st->prev) {
-			//	printf("move to sibling: %d\n",st->scope_lev);
-			//	st=st->prev;
-			//}
-			//st->up->down=st;
 			st=st->up;
 		}
 	}

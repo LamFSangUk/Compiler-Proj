@@ -101,7 +101,6 @@ static void insertNode( TreeNode * t)
 					symtabError(t,"Already Declared Symbol ");
 				else{
 					st_insert(t,loc,0);
-					printf("lev:%s %d\n",t->attr.name,st->scope_lev);
 				}
 				
 				break;
@@ -200,8 +199,14 @@ static void checkNode(TreeNode * t)
 				break;
 			}
 			if(l->arrsize>-1){
-				fprintf(listing,"Type error\tat line %d: Symbol %s is Array\n",t->lineno,t->attr.name);
+				fprintf(listing,"Type error\tat line %d: Symbol %s is an Array\n",t->lineno,t->attr.name);
 				Error=TRUE;
+				break;
+			}
+			if(l->vpf==Funck){
+				fprintf(listing,"Type error\tat line %d: Symbol %s is a Function\n",t->lineno,t->attr.name);
+				Error=TRUE;
+				break;
 			}
 
 			break;
@@ -216,7 +221,8 @@ static void checkNode(TreeNode * t)
 			}			
 
 			if(l->arrsize==-1){
-				typeError(t,"Symbol is not Array");
+				fprintf(listing,"Type error\tat line %d: Symbol %s is NOT an Array\n",t->lineno,t->attr.name);
+				Error=TRUE;
 				break;
 			}
 
@@ -302,14 +308,25 @@ static void checkNode(TreeNode * t)
 				break;
 			case FuncK:
 				if(strcmp(t->attr.name,"main")==0){
-					final_flag=1;
 					//Error for main
+					
+					final_flag=1;//Main function is the last dclr.
+
+					//Main_function is Void type
 					if(t->type!=Void){
-						typeError(t,"main function should have void type");
+						fprintf(listing,"Type error\tat line %d: The main function must be of type VOID\n");
+						Error=TRUE;
+						break;
+					}
+					//Main function cannot have the parameters
+					if(t->paranode!=NULL){
+						fprintf(listing,"Type error\tat line %d: The main function CANNOT have parameters\n",t->lineno);
+						Error=TRUE;
 						break;
 					}
 				}
-
+				
+				//Return Stmt exists.
 				if(return_flag==1){
 					if(t->type!=returnNode->type){
 						typeError(t,"Expected Same Type betwwen Func and Return, but actual was different");
