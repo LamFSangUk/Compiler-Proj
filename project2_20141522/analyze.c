@@ -195,7 +195,7 @@ static void checkNode(TreeNode * t)
 			
 			//Check it exists.
 			if(l==NULL){
-				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Symbol",t->attr.name);
+				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Variable",t->attr.name);
 				Error=TRUE;
 			}
 
@@ -217,6 +217,14 @@ static void checkNode(TreeNode * t)
 		case CallK:
 			//Is it function?
 			l=st_lookup(t->attr.name,1);
+			
+			//Check it exists.
+			if(l==NULL){
+				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t-lineno,"Undeclared Function",t->attr.name);
+				Error=TRUE;
+				break;
+			}
+
 			if(l->vpf!=Func){
 				typeError(t,"Symbol is not Function");
 				break;
