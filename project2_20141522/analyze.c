@@ -203,7 +203,7 @@ static void checkNode(TreeNode * t)
 				Error=TRUE;
 				break;
 			}
-			if(l->vpf==Funck){
+			if(l->vpf==Func){
 				fprintf(listing,"Type error\tat line %d: Symbol %s is a Function\n",t->lineno,t->attr.name);
 				Error=TRUE;
 				break;
@@ -290,7 +290,7 @@ static void checkNode(TreeNode * t)
       }
       break;
 	case DclrK:
-		if(final_flag){
+		if(final_flag && st->scope_lev==0){
 			typeError(t,"main function should be the last declaration");
 			break;
 		}
@@ -314,12 +314,12 @@ static void checkNode(TreeNode * t)
 
 					//Main_function is Void type
 					if(t->type!=Void){
-						fprintf(listing,"Type error\tat line %d: The main function must be of type VOID\n");
+						fprintf(listing,"Type error\tat line %d: The main function must be of type VOID\n",t->lineno);
 						Error=TRUE;
 						break;
 					}
 					//Main function cannot have the parameters
-					if(t->paranode!=NULL){
+					if(t->child[0]!=NULL){
 						fprintf(listing,"Type error\tat line %d: The main function CANNOT have parameters\n",t->lineno);
 						Error=TRUE;
 						break;
@@ -356,8 +356,14 @@ static void checkNode(TreeNode * t)
  * by a postorder syntax tree traversal
  */
 static void FindScope(TreeNode *t){
-	if(t->nodekind==StmtK && t->kind.stmt==CompK) 
+	if(t->nodekind==DclrK && t->kind.dclr==FuncK){
+		funcscope=TRUE;
 		if(st->down) st=st->down;
+	}
+	if(t->nodekind==StmtK && t->kind.stmt==CompK){
+		if(funcscope) funcscope=FALSE;
+		else if(st->down) st=st->down;
+	}
 }
 
 void typeCheck(TreeNode * syntaxTree)
