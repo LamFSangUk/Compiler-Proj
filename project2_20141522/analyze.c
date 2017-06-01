@@ -148,24 +148,6 @@ void buildSymtab(TreeNode * syntaxTree)
  	printSymTab(listing);
 }
 
-static void typeError(TreeNode * t, char * message)
-{ fprintf(listing,"Type error\tat line %-4d: %s\n",t->lineno,message);
-  Error = TRUE;
-}
-
-static char getOperator(int token){
-	char c;
-	switch(token){
-		case PLUS:	c='+';break;
-		case MINUS: c='-';break;
-		case TIMES: c='*';break;
-		case OVER:	c='/';break;
-		default:
-			break;
-	}
-	return c;
-}
-
 static int return_flag=0;
 static int final_flag=0;
 static TreeNode * returnNode=NULL;
@@ -179,26 +161,32 @@ static void checkNode(TreeNode * t)
   { BucketList l;
 	case ExpK:
       switch (t->kind.exp)
-      { char op;
-		case OpK:
-			op=getOperator(t->attr.op);	
+      { case OpK:
 
-			//Check For Left Child
-			if(t->child[0]->type == Void){
-				typeError(t,"Operand1 expected Integer, but actual was Void");
-				//fprintf(listing,"\t\t\tExp: %s %c %s\n",t->child[0]->attr.name,op,t->child[1]->attr.name);
-				break;
-			}
-			//Check for Right Child
-			if(t->child[1]->type == Void){
-				typeError(t,"Operand2 expected Integer, but actual was Void");				
-				//fprintf(listing,"\t\t\tExp: %s %c %s\n",t->child[0]->attr.name,op,t->child[1]->attr.name);
+			//Check For Left Child and Right Child
+			if(t->child[0]->type == Void || t->child[1]->type==Void){
+				fprintf(listing,"Type error\tat line %-4d: Invalid type in ",t->lineno);
+				if(t->attr.op==PLUS || t->attr.op==MINUS){
+					fprintf(listing,"addexp ");
+				}
+				else if(t->attr.op==TIMES || t->attr.op==OVER){
+					fprintf(listing,"term ");
+				}
+				fprintf(listing,"expression\n");
+				fprintf(listing,"\t\t\toperand1 has type ");
+				if(t->child[0]->type==Integer) fprintf(listing,"Integer ");
+				else fprintf(listing,"Void ");
+				fprintf(listing,", operand2 has type ");
+				if(t->child[1]->type==Integer) fprintf(listing,"Integer ");
+				else fprintf(listing,"Void ");
+
+				Error=TRUE;
 				break;
 			}
 			//Assigh check for same type
 			if(t->child[0]->type != t->child[1]->type){
 				//Actually No need in Cminus, cause all type of var to operate is integer
-				typeError(t,"Operator ERROR: different type");
+				fprintf(listing,"Type error\tat line %-4d: Different Type between operands\n",t->lineno);
 				break;
 			}
 			t->type=t->child[0]->type;
@@ -263,19 +251,20 @@ static void checkNode(TreeNode * t)
 			arglist=t->child[0];
 			while(paralist){
 				if(!arglist){
-					typeError(t,"The num of parameter is different");
+					fprintf(listing,"Type error\tat line %-4d: Call Function(%s) has LESS arguments\n",t->lineno,t->attr.name);
+					Error=TRUE;
 					break;
 				}
 
 				if(paralist->type != arglist->type){
-					typeError(t,"parameter doesn't match type");
 					fprintf(listing,"Type error\tat line %-4d: Parameter %s has DIFF type with Argument %s\n",t->lineno,paralist->attr.name,arglist->attr.name);
 				}
 				arglist=arglist->sibling;
 				paralist=paralist->sibling;
 			}
 			if(arglist){
-				typeError(t,"The num of parameter is different");
+				fprintf(listing,"Type error\tat line %-4d: Call Function(%s) has MORE arguments\n",t->lineno,t->attr.name);
+				Error=TRUE;				
 				break;
 			}
 			break;
@@ -312,8 +301,8 @@ static void checkNode(TreeNode * t)
 			case VarK:
 			case VarArrK:
 				if(t->type==Void){//Cannot declare VOID type var
-					typeError(t,"Cannot Declare VOID Type Variable");
-					break;
+					fprintf(listing,"Type error\tat line %-4d: CANNOT declare VOID type variable\n",t->lineno);
+					Error=TRUE;
 				}		
 				break;
 			case FuncK:
