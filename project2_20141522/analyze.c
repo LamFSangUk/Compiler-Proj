@@ -60,11 +60,12 @@ static void insertNode( TreeNode * t)
   { case StmtK:
       switch (t->kind.stmt)
       { case CompK:
-			if(!funcscope)
+			if(!funcscope){
 				st_scopeup();
+				location[st->scope_lev]=0;
+			}
 			else {
 				funcscope=FALSE;
-				paraloc=0;
 			}
 			break;
         default:
@@ -100,10 +101,9 @@ static void insertNode( TreeNode * t)
 			int loc;
 			BucketList l;
 			case VarArrK:
-				if(!funcscope) location[func_count]-=4*t->size;
+				//if(!funcscope) location[func_count]-=4*t->size;
 			case VarK:
-				if(!funcscope) { loc=location[func_count]; location[func_count]-=4; }
-				else { loc=paraloc; paraloc+=4; }
+				
 
 				if(l=st_lookup(t->attr.name,0)){
 				/* already in table, so it is an error. */
@@ -111,7 +111,7 @@ static void insertNode( TreeNode * t)
 					fprintf(listing,"\t\t\t\tfirst declared at line %d\n",l->lines->lineno);
 				}
 				else{
-					st_insert(t,loc,0);
+					st_insert(t,location[st->scope_lev]++,0);
 				}
 				
 				break;
@@ -123,11 +123,11 @@ static void insertNode( TreeNode * t)
 					fprintf(listing,"\t\t\t\tfirst declared at line %d\n",l->lines->lineno);
 				}
 				else{
-					st_insert(t,func_count++,0);
-					location[func_count]=-4*(func_count-1);
+					st_insert(t,location[st->scope_lev]++,0);
 				}
 				funcscope=TRUE;
 				st_scopeup();
+				location[st->scope_lev]=0;
 				
 				break;
 		}
@@ -240,8 +240,8 @@ static void checkNode(TreeNode * t)
 
 			//Check For Array Idx
 			if(!t->child[0] || t->child[0]->type!=Integer){
-				typeError(t,"invalid subscript of array\n\t\t\texpected int but actual was void");
-				break;
+				fprintf(listing,"Type error\tat line %-4d: Invalid subscript of array\n\t\t\t\texpected INT but actually was VOID",t->lineno);
+				Error=TRUE;
 			}
 			break;
 		case CallK:
@@ -255,7 +255,8 @@ static void checkNode(TreeNode * t)
 			}
 
 			if(l->vpf!=Func){
-				typeError(t,"Symbol is not Function");
+				fprintf(listing,"Type error\tat line %-4d: Symbol %s is NOT a Function\n",t->lineno,t->attr.name);
+				Error=TRUE;
 				break;
 			}
 			paralist=l->paranode;
@@ -268,7 +269,7 @@ static void checkNode(TreeNode * t)
 
 				if(paralist->type != arglist->type){
 					typeError(t,"parameter doesn't match type");
-					break;
+					fprintf(listing,"Type error\tat line %-4d: Parameter %s has DIFF type with Argument %s\n",t->lineno,paralist->attr.name,arglist->attr.name);
 				}
 				arglist=arglist->sibling;
 				paralist=paralist->sibling;
