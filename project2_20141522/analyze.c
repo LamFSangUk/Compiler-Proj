@@ -9,6 +9,8 @@
 #include "symtab.h"
 #include "analyze.h"
 
+#define ARGS -10
+
 /* counter for variable memory locations */
 static int location[256] = {0};
 static int func_count=0;
@@ -71,9 +73,15 @@ static void insertNode( TreeNode * t)
       break;
     case ExpK:
       switch (t->kind.exp)
-      { case IdK:
-		case ArrK:
+      { TreeNode * temp;
 		case CallK:
+			temp=t->child[0];
+			while(temp){
+				temp->para=ARGS;
+				temp=temp->sibling;
+			}
+		case IdK:
+		case ArrK:
 
           if (!st_lookup(t->attr.name,1))
           /* not yet in table, so treat as new definition */
@@ -203,7 +211,7 @@ static void checkNode(TreeNode * t)
 				//Already Checked in Symtable Error.
 				break;
 			}
-			if(l->arrsize>-1){
+			if(l->arrsize>-1 && t->para!=ARGS){
 				fprintf(listing,"Type error\tat line %-4d: Symbol %s is an Array\n",t->lineno,t->attr.name);
 				Error=TRUE;
 				break;
