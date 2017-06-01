@@ -90,15 +90,18 @@ static void insertNode( TreeNode * t)
 	case DclrK:
 		switch(t->kind.dclr){
 			int loc;
+			BucketList l;
 			case VarArrK:
 				if(!funcscope) location[func_count]-=4*t->size;
 			case VarK:
 				if(!funcscope) { loc=location[func_count]; location[func_count]-=4; }
 				else { loc=paraloc; paraloc+=4; }
 
-				if(st_lookup(t->attr.name,0))
+				if(l=st_lookup(t->attr.name,0)){
 				/* already in table, so it is an error. */
-					symtabError(t,"Already Declared Symbol ");
+					symtabError(t,"Already Declared Symbol");
+					fprintf(listing,"\t\t\t\tfirst declared at line %d\n",l->lines->lineno);
+				}
 				else{
 					st_insert(t,loc,0);
 				}
@@ -106,15 +109,18 @@ static void insertNode( TreeNode * t)
 				break;
 			case FuncK:	
 				
-				if(st_lookup(t->attr.name,0))
+				if(l=st_lookup(t->attr.name,0)){
 					/* already in table, so it is an error. */
-					symtabError(t,"Already Declared Function ");
+					symtabError(t,"Already Declared Symbol");
+					fprintf(listing,"\t\t\t\tfirst declared at line %d\n",l->lines->lineno);
+				}
 				else{
 					st_insert(t,func_count++,0);
 					location[func_count]=-4*(func_count-1);
-					funcscope=TRUE;
-					st_scopeup();
 				}
+				funcscope=TRUE;
+				st_scopeup();
+				
 				break;
 		}
 		break;
@@ -325,9 +331,9 @@ static void checkNode(TreeNode * t)
 					if(t->type!=returnNode->type){
 						fprintf(listing,"Type error\tat line %-4d: Different type between FUNC(%s) and RETURN\n",t->lineno,t->attr.name);
 						Error=TRUE;
-						returnNode=NULL;
-						return_flag=0;
 					}
+					returnNode=NULL;
+					return_flag=0;
 				}
 				else{
 					if(t->type!=Void){
