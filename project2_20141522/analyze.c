@@ -35,7 +35,7 @@ static void traverse( TreeNode * t,
 
 static void symtabError(TreeNode * t, char * msg)
 {
-	fprintf(listing,"Symbol error at line %d: %s %s\n",t->lineno, msg,t->attr.name);
+	fprintf(listing,"Symbol error\tat line %-4d: %s %s\n",t->lineno, msg,t->attr.name);
 	Error = TRUE;
 }
 
@@ -135,7 +135,7 @@ void buildSymtab(TreeNode * syntaxTree)
 }
 
 static void typeError(TreeNode * t, char * message)
-{ fprintf(listing,"Type error\tat line %d: %s\n",t->lineno,message);
+{ fprintf(listing,"Type error\tat line %-4d: %s\n",t->lineno,message);
   Error = TRUE;
 }
 
@@ -162,10 +162,10 @@ static TreeNode * arglist=NULL;
  */
 static void checkNode(TreeNode * t)
 { switch (t->nodekind)
-  { case ExpK:
+  { BucketList l;
+	case ExpK:
       switch (t->kind.exp)
       { char op;
-		BucketList l;
 		case OpK:
 			op=getOperator(t->attr.op);	
 
@@ -194,17 +194,16 @@ static void checkNode(TreeNode * t)
 			
 			//Check it exists.
 			if(l==NULL){
-				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Variable",t->attr.name);
-				Error=TRUE;
+				//Already Checked in Symtable Error.
 				break;
 			}
 			if(l->arrsize>-1){
-				fprintf(listing,"Type error\tat line %d: Symbol %s is an Array\n",t->lineno,t->attr.name);
+				fprintf(listing,"Type error\tat line %-4d: Symbol %s is an Array\n",t->lineno,t->attr.name);
 				Error=TRUE;
 				break;
 			}
 			if(l->vpf==Func){
-				fprintf(listing,"Type error\tat line %d: Symbol %s is a Function\n",t->lineno,t->attr.name);
+				fprintf(listing,"Type error\tat line %-4d: Symbol %s is a Function\n",t->lineno,t->attr.name);
 				Error=TRUE;
 				break;
 			}
@@ -215,13 +214,12 @@ static void checkNode(TreeNode * t)
 			l=st_lookup(t->attr.name,1);
 			//check it exists
 			if(l==NULL){
-				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Array",t->attr.name);
-				Error=TRUE;
+				//Already Checked in Symtable Error.
 				break;
 			}			
 
 			if(l->arrsize==-1){
-				fprintf(listing,"Type error\tat line %d: Symbol %s is NOT an Array\n",t->lineno,t->attr.name);
+				fprintf(listing,"Type error\tat line %-4d: Symbol %s is NOT an Array\n",t->lineno,t->attr.name);
 				Error=TRUE;
 				break;
 			}
@@ -238,8 +236,7 @@ static void checkNode(TreeNode * t)
 			
 			//Check it exists.
 			if(l==NULL){
-				fprintf(listing,"Symbol error\tat line %d: %s %s\n",t->lineno,"Undeclared Function",t->attr.name);
-				Error=TRUE;
+				//Already Checked in Symtable Error.
 				break;
 			}
 
@@ -291,22 +288,21 @@ static void checkNode(TreeNode * t)
       break;
 	case DclrK:
 		if(final_flag && st->scope_lev==0){
-			typeError(t,"main function should be the last declaration");
+			fprintf(listing,"Type error\tat line %-4d: The main function must be the last declaration\n",t->lineno);
+			Error=TRUE;
 			break;
 		}
 		switch (t->kind.dclr)
 		{
 			case VarK:
 			case VarArrK:
-					if(t->type==Void){//Cannot declare VOID type var
+				if(t->type==Void){//Cannot declare VOID type var
 					typeError(t,"Cannot Declare VOID Type Variable");
 					break;
-				}
-				/*if(t->para!=0 && strcmp(t->attr.name,"main")==0){
-					typeError(t,"main function cannot have parameters");
-				}*/
+				}		
 				break;
 			case FuncK:
+
 				if(strcmp(t->attr.name,"main")==0){
 					//Error for main
 					
@@ -314,33 +310,31 @@ static void checkNode(TreeNode * t)
 
 					//Main_function is Void type
 					if(t->type!=Void){
-						fprintf(listing,"Type error\tat line %d: The main function must be of type VOID\n",t->lineno);
+						fprintf(listing,"Type error\tat line %-4d: The main function must be of type VOID\n",t->lineno);
 						Error=TRUE;
-						break;
 					}
 					//Main function cannot have the parameters
 					if(t->child[0]!=NULL){
-						fprintf(listing,"Type error\tat line %d: The main function CANNOT have parameters\n",t->lineno);
+						fprintf(listing,"Type error\tat line %-4d: The main function CANNOT have parameters\n",t->lineno);
 						Error=TRUE;
-						break;
 					}
 				}
 				
 				//Return Stmt exists.
 				if(return_flag==1){
 					if(t->type!=returnNode->type){
-						typeError(t,"Expected Same Type betwwen Func and Return, but actual was different");
-						break;
+						fprintf(listing,"Type error\tat line %-4d: Different type between FUNC(%s) and RETURN\n",t->lineno,t->attr.name);
+						Error=TRUE;
+						returnNode=NULL;
+						return_flag=0;
 					}
 				}
 				else{
 					if(t->type!=Void){
-						typeError(t,"Expected Return, but actual didn't exist");
-						break;
+						fprintf(listing,"Type error\tat line %-4d: Integer function(%s) expected RETURN, but actually has NO RETURN\n",t->lineno,t->attr.name);
+						Error=TRUE;	
 					}
 				}
-				returnNode=NULL;
-				return_flag=0;	
 				break;
 			default:
 				break;

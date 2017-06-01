@@ -2,7 +2,7 @@
 		duplicated function, variable */
 int a;
 int a;
-void run(void){
+void fun(void){
 	;
 }
 int fun(int a){
