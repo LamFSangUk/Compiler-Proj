@@ -150,7 +150,7 @@ void buildSymtab(TreeNode * syntaxTree)
 
 static int return_flag=0;
 static int final_flag=0;
-static TreeNode * returnNode=NULL;
+static TreeNode * returnNode[256];
 static TreeNode * paralist=NULL;
 static TreeNode * arglist=NULL;
 /* Procedure checkNode performs
@@ -173,13 +173,13 @@ static void checkNode(TreeNode * t)
 					fprintf(listing,"term ");
 				}
 				fprintf(listing,"expression\n");
-				fprintf(listing,"\t\t\toperand1 has type ");
+				fprintf(listing,"\t\t\t\toperand1 has type ");
 				if(t->child[0]->type==Integer) fprintf(listing,"Integer ");
 				else fprintf(listing,"Void ");
 				fprintf(listing,", operand2 has type ");
 				if(t->child[1]->type==Integer) fprintf(listing,"Integer ");
 				else fprintf(listing,"Void ");
-
+				fprintf(listing,"\n");
 				Error=TRUE;
 				break;
 			}
@@ -228,7 +228,7 @@ static void checkNode(TreeNode * t)
 
 			//Check For Array Idx
 			if(!t->child[0] || t->child[0]->type!=Integer){
-				fprintf(listing,"Type error\tat line %-4d: Invalid subscript of array\n\t\t\t\texpected INT but actually was VOID",t->lineno);
+				fprintf(listing,"Type error\tat line %-4d: Invalid subscript of array\n\t\t\t\texpected INT but actually was VOID\n",t->lineno);
 				Error=TRUE;
 			}
 			break;
@@ -281,8 +281,7 @@ static void checkNode(TreeNode * t)
 			st=st->up;
 			break;
 		case ReturnK:
-			return_flag=1;
-			returnNode=t;
+			returnNode[return_flag++]=t;
 			if(t->child[0]) t->type=t->child[0]->type;
 			else t->type=Void;
 			break;
@@ -325,13 +324,14 @@ static void checkNode(TreeNode * t)
 				}
 				
 				//Return Stmt exists.
-				if(return_flag==1){
-					if(t->type!=returnNode->type){
-						fprintf(listing,"Type error\tat line %-4d: Different type between FUNC(%s) and RETURN\n",t->lineno,t->attr.name);
-						Error=TRUE;
+				if(return_flag){
+					while(return_flag){
+						if(t->type!=returnNode[--return_flag]->type){
+							fprintf(listing,"Type error\tat line %-4d: Different type between FUNC(%s) and RETURN\n",t->lineno,t->attr.name);
+							Error=TRUE;
+						}
+						returnNode[return_flag]=NULL;
 					}
-					returnNode=NULL;
-					return_flag=0;
 				}
 				else{
 					if(t->type!=Void){
