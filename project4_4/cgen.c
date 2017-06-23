@@ -194,10 +194,11 @@ static void genExp( TreeNode * tree)
 
 		
 			/////////////////////////////////////////// not yet implemented ////////////////////////////////////////
-			//	l = st_lookdown(tree->attr.name);
-			//if(l->arrsize !=-1)		// if id is array (pass address of array as argument, then the name of the array is recognized as IdK)
-			//	emitRR("move",getRegisterName(t1),getRegisterName(t2),NULL);
-			//else
+				l = tree->bl;
+			printf("Codegen %s %d\n",tree->attr.name, l->arrsize);
+			if(l->arrsize !=-1)		// if id is array (pass address of array as argument, then the name of the array is recognized as IdK)
+				emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
+			else
 				emitRRM("addi",getRegisterName(t2),getRegisterName(fp),0,"not yet implemented");
 			/////////////////////////////////////////// not yet implemented ////////////////////////////////////////
 
@@ -309,11 +310,11 @@ static void genExp( TreeNode * tree)
 
 
 			///////////////////////////////// not implemented /////////////////////////////////////////////
-			//l = tree->bucket_ptr;
+			l = tree->bl;
 
-			//if(l->scope_lev == 0)
-			//	fprintf(code,"\tlda t2, name\n");
-			//else
+			if(l->scope_lev == 0)
+				fprintf(code,"\tlda t2, name\n");
+			else
 			emitRRM("addi",getRegisterName(t2),getRegisterName(fp),-20,"not yet, need to implement finding right bucketList");
 			///////////////////////////////// not implemented /////////////////////////////////////////////
 

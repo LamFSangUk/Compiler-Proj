@@ -99,11 +99,12 @@ char * name;
 typedef struct BucketListRec
    { char * name;
      LineList lines;
-         DclrExpType type;
-         IdType vpf;
-		 int arrsize;
-		 ParaInfo * paranode;
+     DclrExpType type;
+     IdType vpf;
+	 int arrsize;
+	 ParaInfo * paranode;
      int memloc ; /* memory location for variable */
+	 int scope_lev;
      struct BucketListRec * next;
    } * BucketList;
 
@@ -120,7 +121,7 @@ typedef struct treeNode
 	 short para;
      DclrExpType type; /* for type checking of exps and dclrs */
    	
-		BucketList * bl;
+		BucketList bl;
 	} TreeNode;
 
 /**************************************************/

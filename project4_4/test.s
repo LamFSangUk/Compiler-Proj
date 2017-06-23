@@ -130,7 +130,7 @@ test:
 # -> Const
 	   li  $t1,2 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	lda t2, name
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -208,7 +208,7 @@ test:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	lda t2, name
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -222,7 +222,7 @@ test:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	lda t2, name
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -244,7 +244,7 @@ test:
 # -> Const
 	   li  $t1,1 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	lda t2, name
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -296,7 +296,7 @@ test:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	lda t2, name
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -314,7 +314,7 @@ test:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	lda t2, name
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -881,7 +881,7 @@ label8:
 	 addi  $sp,$sp,-4 
 	   sw  $t1,0($sp) 
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+	 move  $t1,$t2 
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 
