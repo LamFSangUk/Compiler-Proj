@@ -423,7 +423,7 @@ static void genDecl( TreeNode * tree)
 /* Procedure cGen recursively generates code by
  * tree traversal
  */
-	static void cGen( TreeNode * tree)
+static void cGen( TreeNode * tree)
 { if (tree != NULL)
 	{ 
 		//		if(tree->attr.name)
