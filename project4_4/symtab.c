@@ -30,10 +30,14 @@ static int hash ( char * key )
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
+
 void st_insert( TreeNode * tnode, int loc ,int mode)
 // mpde 0 for just current scope, use it in Dclr
 // mode 1 for all scope, use it in Exp
 { int h = hash(tnode->attr.name);
+	TreeNode * paralist;
+	ParaInfo * prev=NULL;
+	ParaInfo * cur=NULL;
 	if(mode==0){
 		BucketList l =  st->hashTable[h];
 		while ((l != NULL) && (strcmp(tnode->attr.name,l->name) != 0))
@@ -45,7 +49,20 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 			l->lines->lineno = tnode->lineno;
 			if(tnode->kind.dclr==FuncK){
 				l->vpf=Func;
-				l->paranode=tnode->child[0];
+				paralist=tnode->child[0];//Change Here
+				while(paralist){
+					
+					cur=(ParaInfo*)malloc(sizeof(ParaInfo));
+					cur->name=paralist->attr.name;
+					cur->type=paralist->type;
+					cur->sibling=NULL;
+
+					if(prev) prev->sibling=cur;
+					if(!(l->paranode)) l->paranode=cur;
+
+					prev=cur;	
+					paralist=paralist->sibling;
+				}
 			}
 			else{
 				l->paranode=NULL;
@@ -59,6 +76,7 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 			l->next = st->hashTable[h];
 			st->hashTable[h] = l; 
 		
+			tnode->bl=l;
 			//tnode -> bucket_ptr=l;
 		}
 		else /* found in table, so just add line number */
@@ -68,6 +86,7 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 			t->next->lineno = tnode->lineno;
 			t->next->next = NULL;
 			
+			tnode->bl=l;
 		}
 	}
 	else{
@@ -82,14 +101,21 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 				tnode->type=l->type;
 
 				while(t->next != NULL){
-					if(t->lineno == tnode->lineno) return; //eleminate the duplicated LineListRec
+					if(t->lineno == tnode->lineno) {
+						tnode->bl=l;
+						return; //eleminate the duplicated LineListRec
+					}
 					 t = t->next;
 				}
-				if(t->lineno == tnode->lineno) return;
+				if(t->lineno == tnode->lineno){
+					tnode->bl=l;
+					 return;
+				}
 				t->next = (LineList) malloc(sizeof(struct LineListRec));
 				t->next->lineno = tnode->lineno;
 				t->next->next=NULL;
 				
+				tnode->bl=l;
 				return;
 			}
 

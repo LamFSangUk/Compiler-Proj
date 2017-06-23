@@ -151,7 +151,7 @@ void buildSymtab(TreeNode * syntaxTree)
 static int return_flag=0;
 static int final_flag=0;
 static TreeNode * returnNode[256];
-static TreeNode * paralist=NULL;
+static ParaInfo * paralist=NULL;
 static TreeNode * arglist=NULL;
 /* Procedure checkNode performs
  * type checking at a single tree node
@@ -257,7 +257,7 @@ static void checkNode(TreeNode * t)
 				}
 
 				if(paralist->type != arglist->type){
-					fprintf(listing,"Type error\tat line %-4d: Parameter %s has DIFF type with Argument %s\n",t->lineno,paralist->attr.name,arglist->attr.name);
+					fprintf(listing,"Type error\tat line %-4d: Parameter %s has DIFF type with Argument %s\n",t->lineno,paralist->name,arglist->attr.name);
 				}
 				arglist=arglist->sibling;
 				paralist=paralist->sibling;

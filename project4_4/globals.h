@@ -74,8 +74,38 @@ typedef enum {VarK,VarArrK,FuncK} DclrKind;
 
 /* ExpType is used for type checking */
 typedef enum {Void,Integer} DclrExpType;
+typedef enum {Var, Para, Func} IdType;
 
 #define MAXCHILDREN 3
+
+typedef struct LineListRec
+   { int lineno;
+     struct LineListRec * next;
+   } * LineList;
+
+typedef struct _parainfo{
+char * name;
+	DclrExpType type;
+	struct _parainfo * sibling;
+}ParaInfo;
+
+
+/* The record in the bucket lists for
+ * each variable, including name,
+ * assigned memory location, and
+ * the list of line numbers in which
+ * it appears in the source code
+ */
+typedef struct BucketListRec
+   { char * name;
+     LineList lines;
+         DclrExpType type;
+         IdType vpf;
+		 int arrsize;
+		 ParaInfo * paranode;
+     int memloc ; /* memory location for variable */
+     struct BucketListRec * next;
+   } * BucketList;
 
 typedef struct treeNode
    { struct treeNode * child[MAXCHILDREN];
@@ -89,10 +119,9 @@ typedef struct treeNode
 	 int size;
 	 short para;
      DclrExpType type; /* for type checking of exps and dclrs */
-	 //SymTabList sym_ptr;
-   } TreeNode;
-
-typedef enum {Var, Para, Func} IdType;
+   	
+		BucketList * bl;
+	} TreeNode;
 
 /**************************************************/
 /***********   Flags for tracing       ************/
