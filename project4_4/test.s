@@ -82,7 +82,7 @@ mul:
 	   sw  $t1,0($sp) #	push temp(save_reg_num) to sp
 --12
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+     t	 addi  $t2,$fp,0 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	   lw  $t2,0($sp) #	pop temp(save_reg_num) to sp
@@ -130,7 +130,7 @@ test:
 # -> Const
 	   li  $t1,2 
 # <- Const
-	lda t2, name
+	   la  $t2,bb
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -146,7 +146,7 @@ test:
 268
 --21
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+     x	 addi  $t2,$fp,3 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 
@@ -160,7 +160,7 @@ test:
 	   sw  $t1,0($sp) #	push temp(save_reg_num) to sp
 --21
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+   tmp	 addi  $t2,$fp,4 #	not yet implemented
 	 move  $t1,$t2 
 # <- Id
 	   lw  $t2,0($sp) #	pop temp(save_reg_num) to sp
@@ -178,7 +178,7 @@ test:
 273
 --23
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    aa	 addi  $t2,$fp,0 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 #	sp -= 4
@@ -193,7 +193,7 @@ test:
 275
 --23
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    ab	 addi  $t2,$fp,1 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 #	sp -= 4
@@ -208,7 +208,7 @@ test:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	lda t2, name
+	   la  $t2,bb
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -222,7 +222,7 @@ test:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	lda t2, name
+	   la  $t2,bb
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -244,7 +244,7 @@ test:
 # -> Const
 	   li  $t1,1 
 # <- Const
-	lda t2, name
+	   la  $t2,bb
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -270,14 +270,14 @@ test:
 275
 --23
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    aa	 addi  $t2,$fp,0 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 #	sp -= 4
 	   sw  $t1,0($sp) #	push temp(save_reg_num) to sp
 --23
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    ab	 addi  $t2,$fp,1 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	   lw  $t2,0($sp) #	pop temp(save_reg_num) to sp
@@ -296,7 +296,7 @@ test:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	lda t2, name
+	   la  $t2,ba
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -314,7 +314,7 @@ test:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	lda t2, name
+	   la  $t2,bb
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -387,7 +387,7 @@ size: 3
 266
 --33
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    ca	 addi  $t2,$fp,0 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 #	sp -= 4
@@ -413,7 +413,7 @@ size: 3
 # -> Const
 	   li  $t1,0 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -488,7 +488,7 @@ size: 3
 # -> Const
 	   li  $t1,2 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -516,7 +516,7 @@ label1:
 # -> Const
 	   li  $t1,2 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -544,7 +544,7 @@ label0:
 268
 --37
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    aa	 addi  $t2,$fp,0 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 #	sp -= 4
@@ -555,7 +555,7 @@ label0:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -573,7 +573,7 @@ label0:
 # -> Const
 	   li  $t1,2 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -587,7 +587,7 @@ label0:
 	   sw  $t1,0($sp) #	push temp(save_reg_num) to sp
 --37
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    ca	 addi  $t2,$fp,0 #	not yet implemented
 	 move  $t1,$t2 
 # <- Id
 	   lw  $t2,0($sp) #	pop temp(save_reg_num) to sp
@@ -603,7 +603,7 @@ label0:
 266
 --39
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    ca	 addi  $t2,$fp,0 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 #	sp -= 4
@@ -627,7 +627,7 @@ label0:
 # -> Const
 	   li  $t1,2 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -641,7 +641,7 @@ label0:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -658,7 +658,7 @@ label3:
 label5:
 --40
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    ca	 addi  $t2,$fp,0 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 bnez:     t1, label6 
@@ -678,7 +678,7 @@ label5:
 # -> Const
 	   li  $t1,1 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -704,7 +704,7 @@ label7:
 # -> Const
 	   li  $t1,1 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -725,7 +725,7 @@ label7:
 # -> Const
 	   li  $t1,0 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -739,7 +739,7 @@ label7:
 # -> Const
 	   li  $t1,2 
 # <- Const
-	 addi  $t2,$fp,-20 #	not yet, need to implement finding right bucketList
+	 addi  $t2,$fp,-20 
 	   li  $t3,4 
 	  mul  $t3,$t1,$t3 
 	  add  $t1,$t2,$t3 
@@ -779,7 +779,7 @@ label9:
 	   sw  $t1,0($sp) #	push temp(save_reg_num) to sp
 --56
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+     c	 addi  $t2,$fp,0 #	not yet implemented
 	 move  $t1,$t2 
 # <- Id
 	   lw  $t2,0($sp) #	pop temp(save_reg_num) to sp
@@ -795,7 +795,7 @@ label9:
 266
 --57
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+     c	 addi  $t2,$fp,0 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 #	sp -= 4
@@ -861,7 +861,7 @@ label8:
 276
 --69
 # -> Id
-	 addi  $t2,$fp,0 #	not yet implemented
+    ab	 addi  $t2,$fp,1 #	not yet implemented
 	   lw  $t1,0($t2) 
 # <- Id
 	 addi  $sp,$sp,-4 #	sp -= 4

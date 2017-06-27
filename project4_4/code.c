@@ -28,7 +28,7 @@ void emitLabel(int label_num)
 void emitComment( char * c )
 { if (TraceCode) fprintf(code,"# %s\n",c);}
 
-void emitRR( char *op, char* r, char* s, char *c)	// register, register
+ emitRR( char *op, char* r, char* s, char *c)	// register, register
 { fprintf(code,"\t%5s  $%s,$%s ",op,r,s);
   if (TraceCode && c) fprintf(code,"#\t%s",c) ;
   fprintf(code,"\n") ;

@@ -81,6 +81,8 @@ static void insertNode( TreeNode * t)
 				temp->para=ARGS;
 				temp=temp->sibling;
 			}
+			if(strcmp(t->attr.name,"input")==0) break;
+			else if(strcmp(t->attr.name,"output")==0) break;
 		case IdK:
 		case ArrK:
 

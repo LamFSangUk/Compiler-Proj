@@ -194,12 +194,17 @@ static void genExp( TreeNode * tree)
 
 		
 			/////////////////////////////////////////// not yet implemented ////////////////////////////////////////
-				l = tree->bl;
-			printf("Codegen %s %d\n",tree->attr.name, l->arrsize);
-			if(l->arrsize !=-1)		// if id is array (pass address of array as argument, then the name of the array is recognized as IdK)
-				emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
-			else
-				emitRRM("addi",getRegisterName(t2),getRegisterName(fp),0,"not yet implemented");
+			l = tree->bl;
+			if(l->arrsize !=-1){		// if id is array (pass address of array as argument, then the name of the array is recognized as IdK)
+				if(l->scope_lev==0) fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(ac),l->name);
+				else emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
+			}
+			else{
+				fprintf(code,"%6s",l->name);
+				
+				if(l->scope_lev==0) fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(ac),l->name);
+				else emitRRM("addi",getRegisterName(t2),getRegisterName(fp),l->memloc,"not yet implemented");
+			}
 			/////////////////////////////////////////// not yet implemented ////////////////////////////////////////
 
 
@@ -313,9 +318,10 @@ static void genExp( TreeNode * tree)
 			l = tree->bl;
 
 			if(l->scope_lev == 0)
-				fprintf(code,"\tlda t2, name\n");
+				 fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(t2),l->name);	
+				//fprintf(code,"\tlda t2, name\n");
 			else
-			emitRRM("addi",getRegisterName(t2),getRegisterName(fp),-20,"not yet, need to implement finding right bucketList");
+				emitRRM("addi",getRegisterName(t2),getRegisterName(fp),-20,NULL);
 			///////////////////////////////// not implemented /////////////////////////////////////////////
 
 
