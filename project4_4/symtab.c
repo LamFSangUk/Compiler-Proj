@@ -72,6 +72,7 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 			l->arrsize=tnode->size;
 			l->type=tnode->type;
 			l->memloc = loc;
+			l->local_loc=tnode->local_loc*-1;
 			l->scope_lev=st->scope_lev;
 			l->lines->next = NULL;
 			l->next = st->hashTable[h];

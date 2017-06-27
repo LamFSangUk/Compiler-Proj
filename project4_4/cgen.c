@@ -34,7 +34,8 @@ static int how_many_locals=0;		// count how many local variables from current st
 static int label_num=0;
 static int assign_flag=0;			// 1 : when it is processing assign statement
 static int call_flag=0;				// 1 : when it is processing call statement
-
+static int old_para_num=0;
+static int new_para_num=0;
 /* prototype for internal recursive code generator */
 static void cGen (TreeNode * tree);
 
@@ -76,7 +77,7 @@ static void genStmt( TreeNode * tree)
 			cGen(p1);
 
 			savedLoc1 = label_num++;
-			emitBranch("bne",getRegisterName(ac),"label",savedLoc1,NULL);
+			emitBranch("bnez",getRegisterName(ac),"label",savedLoc1,NULL);
 			cGen(p2);
 
 			savedLoc2=label_num++;
@@ -100,7 +101,7 @@ static void genStmt( TreeNode * tree)
 			cGen(p1);
 
 			savedLoc1 = label_num++;
-			emitBranch("bne",getRegisterName(ac),"label",savedLoc1,NULL);
+			emitBranch("bnez",getRegisterName(ac),"label",savedLoc1,NULL);
 			cGen(p2);
 			emitLabel(savedLoc1);
 
@@ -199,11 +200,17 @@ static void genExp( TreeNode * tree)
 				if(l->scope_lev==0) fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(ac),l->name);
 				else emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
 			}
-			else{
-				fprintf(code,"%6s",l->name);
-				
-				if(l->scope_lev==0) fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(ac),l->name);
-				else emitRRM("addi",getRegisterName(t2),getRegisterName(fp),l->memloc,"not yet implemented");
+			else{	// if it is variable (not array)
+				if(l->scope_lev==0) 
+					fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(ac),l->name);
+				else{
+			//		fprintf(code,"%s memloc %d para_num %d\n",tree->attr.name,l->memloc,old_para_num);
+					if(l->vpf==Var)
+						emitRRM("addi",getRegisterName(t2),getRegisterName(fp),(l->memloc+1-old_para_num)*-4-4,"not yet implemented");	// minus control link
+					else if(l->vpf == Para)
+						emitRRM("addi",getRegisterName(t2),getRegisterName(fp),(l->memloc+1)*4,"not yet implemented");
+				}	
+			
 			}
 			/////////////////////////////////////////// not yet implemented ////////////////////////////////////////
 
@@ -223,7 +230,7 @@ static void genExp( TreeNode * tree)
 			if (TraceCode) 
 				emitComment("-> Op \n") ;
 
-			fprintf(code,"%d\n",tree->attr.op);
+			//fprintf(code,"%d\n",tree->attr.op);
 			p1 = tree->child[0];
 			p2 = tree->child[1];
 
@@ -327,7 +334,7 @@ static void genExp( TreeNode * tree)
 
 			emitRM("li",getRegisterName(t3),4,NULL);		// get type size(int) of array to register t3
 			emitRRR("mul",getRegisterName(t3),getRegisterName(ac),getRegisterName(t3),NULL);		// 4*exp
-			emitRRR("add",getRegisterName(ac),getRegisterName(t2),getRegisterName(t3),NULL);	// &array + 4*exp
+			emitRRR("addi",getRegisterName(ac),getRegisterName(t2),getRegisterName(t3),NULL);	// &array + 4*exp
 
 			if(p1 && !assign_flag)	// if it is not assign statement, get the value
 			{
@@ -343,12 +350,30 @@ static void genExp( TreeNode * tree)
 			call_flag=1;
 			p1=tree->child[0];		// parameter
 			
+			TreeNode* temp = tree->child[0];
+
+			old_para_num=new_para_num;
+			new_para_num=0;
+			//nt temp_para_num=0;
+			while(temp){			// count the number of parameters
+				new_para_num++;
+				temp=temp->sibling;
+			}
+		//	if(old_para_num==-1)		// if this is the first called function in this program
+		//		old_para_num=temp_para_num;
+		//	else
+		//		old_para_num=new_para_num;
+			
+		//	new_para_num=temp_para_num;
+			
 			while(p1){
 				genExp(p1);			// generate code for each parameter
 
+			    //if(p1->bl->type!=VOID)
+				//{	
 				emitRRM("addi",getRegisterName(sp),getRegisterName(sp),-4,NULL);
 				emitRMR("sw",getRegisterName(ac),0,getRegisterName(sp),NULL);
-
+				//}
 				p1=p1->sibling;
 			}
 
@@ -360,15 +385,15 @@ static void genExp( TreeNode * tree)
 			emitRR("move",getRegisterName(fp),getRegisterName(sp),NULL);		// sp <- fp
 			fprintf(code,"\tjal	%s\n",tree->attr.name);							// function
 
-			int para_num=0;	// save the number of parameters
-			TreeNode* temp = tree->child[0];
+		//	int para_num=0;	// save the number of parameters
+		/*	TreeNode* temp = tree->child[0];
 
 			while(temp){
 				para_num++;
 				temp=temp->sibling;
-			}
+			}*/
 
-			emitRRM("addi",getRegisterName(sp),getRegisterName(sp),para_num,NULL);
+			emitRRM("addi",getRegisterName(sp),getRegisterName(sp),new_para_num*4,NULL);
 
 			break;
 
@@ -389,7 +414,7 @@ static void genDecl( TreeNode * tree)
 			break;
 		case FuncK: 
 			if(!strcmp(tree->attr.name,"main")){
-				fprintf(code,".global main\n");	
+				fprintf(code,".globl main\n");	
 				fprintf(code,"%s:\n",tree->attr.name);
 
 				emitRM("li",getRegisterName(ac),0,"load const");
@@ -407,7 +432,7 @@ static void genDecl( TreeNode * tree)
 			//=st_lookup(tree->attr.name);
 			how_many_locals=0;
 			find(tree->child[1]);
-			emitRRM("addi",getRegisterName(sp),getRegisterName(sp),how_many_locals*(-1),"how_many");
+			emitRRM("addi",getRegisterName(sp),getRegisterName(sp),how_many_locals*(-4),"how_many");
 			//////////////////////////////////////////////////////////not implemented ///////////////////////////////////////
 
 			p2=tree->child[1];
@@ -434,7 +459,7 @@ static void cGen( TreeNode * tree)
 { if (tree != NULL)
 	{ 
 		//		if(tree->attr.name)
-		fprintf(code,"--%d\n",tree->lineno);
+		//fprintf(code,"--%d\n",tree->lineno);
 
 		switch (tree->nodekind) 
 		{
@@ -557,10 +582,10 @@ void find(TreeNode* cur)		// find how many local variables within the scope
 	{
 		if(cur->nodekind==DclrK)
 		{
-			fprintf(code,"------------%s\n",cur->attr.name);
+	//		fprintf(code,"------------%s\n",cur->attr.name);
 			if(cur->size!=-1)			// if it is Array
 			{
-				fprintf(code,"size: %d\n",cur->size);
+			//	fprintf(code,"size: %d\n",cur->size);
 				how_many_locals += cur->size;	
 			}
 			else						// if it is not an array

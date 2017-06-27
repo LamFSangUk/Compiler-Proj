@@ -101,9 +101,9 @@ void emitRestore(void)
 void emitBranch( char *op, char* r,char* label, int a, char * c)
 { 
   if(r)
-	fprintf(code,"\t%5s:  %5s, %s%d ",op,r,label,a);
+	fprintf(code,"\t%5s  $%s, %s%d ",op,r,label,a);
   else
-	fprintf(code,"\t%5s:  %5s%d ",op,label,a);
+	fprintf(code,"\t%5s  %5s%d ",op,label,a);
   
   ++emitLoc ;
   if (TraceCode && c) fprintf(code,"\t%s",c) ;

@@ -104,6 +104,7 @@ typedef struct BucketListRec
 	 int arrsize;
 	 ParaInfo * paranode;
      int memloc ; /* memory location for variable */
+	 int local_loc;
 	 int scope_lev;
      struct BucketListRec * next;
    } * BucketList;
@@ -119,6 +120,7 @@ typedef struct treeNode
              char * name; } attr;
 	 int size;
 	 short para;
+	 int local_loc;
      DclrExpType type; /* for type checking of exps and dclrs */
    	
 		BucketList bl;

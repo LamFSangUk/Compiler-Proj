@@ -13,6 +13,7 @@
 
 /* counter for variable memory locations */
 static int location[256] = {0};
+static int real_loc[256] = {0};
 static int func_count=0;
 static int paraloc=0;
 
@@ -55,6 +56,7 @@ static void nullProc(TreeNode * t)
  * the symbol table 
  */
 static int funcscope=FALSE;
+static int para_count = 0;
 static void insertNode( TreeNode * t)
 { switch (t->nodekind)
   { case StmtK:
@@ -105,7 +107,15 @@ static void insertNode( TreeNode * t)
 			case VarArrK:
 				//if(!funcscope) location[func_count]-=4*t->size;
 			case VarK:
-				
+				if(funcscope) {
+					t->local_loc=para_count++;
+				}
+				else{
+					if(t->kind.dclr==VarArrK) real_loc[st->scope_lev]+=(4*t->size);
+					else if(t->kind.dclr==VarK) real_loc[st->scope_lev]+=4;	
+					
+					t->local_loc=real_loc[st->scope_lev];	
+				}
 
 				if(l=st_lookup(t->attr.name,0)){
 				/* already in table, so it is an error. */
@@ -114,8 +124,8 @@ static void insertNode( TreeNode * t)
 				}
 				else{
 					st_insert(t,location[st->scope_lev]++,0);
-				}
-				
+				}				
+
 				break;
 			case FuncK:	
 				
@@ -128,8 +138,10 @@ static void insertNode( TreeNode * t)
 					st_insert(t,location[st->scope_lev]++,0);
 				}
 				funcscope=TRUE;
+				para_count=0;
 				st_scopeup();
 				location[st->scope_lev]=0;
+				real_loc[st->scope_lev]=0;
 				
 				break;
 		}

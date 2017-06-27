@@ -36,7 +36,7 @@ int EchoSource = TRUE;
 int TraceScan = FALSE;
 int TraceParse = FALSE;
 int TraceAnalyze = TRUE;
-int TraceCode = TRUE;
+int TraceCode = FALSE;
 
 int Error = FALSE;
 
@@ -77,7 +77,7 @@ main(int argc, char * argv[])
 		buildSymtab(syntaxTree);
 		fprintf(listing, "\nChecking Types...\n");
 		typeCheck(syntaxTree);
-		fprintf(listing, "\Type Checking Finished\n");
+		fprintf(listing, "\nType Checking Finished\n");
 	}
 #if !NO_CODE
 	if (!Error)
