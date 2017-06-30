@@ -34,7 +34,6 @@ static int how_many_locals=0;		// count how many local variables from current st
 static int label_num=0;
 static int assign_flag=0;			// 1 : when it is processing assign statement
 static int call_flag=0;				// 1 : when it is processing call statement
-static int old_para_num=0;
 static int new_para_num=0;
 /* prototype for internal recursive code generator */
 static void cGen (TreeNode * tree);
@@ -77,7 +76,7 @@ static void genStmt( TreeNode * tree)
 			cGen(p1);
 
 			savedLoc1 = label_num++;
-			emitBranch("bnez",getRegisterName(ac),"label",savedLoc1,NULL);
+			emitBranch("blez",getRegisterName(ac),"label",savedLoc1,NULL);
 			cGen(p2);
 
 			savedLoc2=label_num++;
@@ -101,7 +100,7 @@ static void genStmt( TreeNode * tree)
 			cGen(p1);
 
 			savedLoc1 = label_num++;
-			emitBranch("bnez",getRegisterName(ac),"label",savedLoc1,NULL);
+			emitBranch("blez",getRegisterName(ac),"label",savedLoc1,NULL);
 			cGen(p2);
 			emitLabel(savedLoc1);
 
@@ -120,7 +119,7 @@ static void genStmt( TreeNode * tree)
 			cGen(p1);
 
 			savedLoc2=label_num++;
-			emitBranch("bnez",getRegisterName(ac),"label",savedLoc2,NULL);
+			emitBranch("blez",getRegisterName(ac),"label",savedLoc2,NULL);
 			cGen(p2);
 			emitBranch("j",NULL,"label",savedLoc1,NULL);
 			emitLabel(savedLoc2);
@@ -176,6 +175,7 @@ static void genStmt( TreeNode * tree)
 static void genExp( TreeNode * tree)
 {	
 	int loc;
+	int temp_assign=0;
 	TreeNode * p1, * p2;
 	BucketList l;
 	switch (tree->kind.exp) {
@@ -193,36 +193,59 @@ static void genExp( TreeNode * tree)
 			if (TraceCode) 
 				emitComment("-> Id") ;
 
-		
+			//fprintf(code,"asdfasdff");
+				
 			/////////////////////////////////////////// not yet implemented ////////////////////////////////////////
 			l = tree->bl;
+			
 			if(l->arrsize !=-1){		// if id is array (pass address of array as argument, then the name of the array is recognized as IdK)
-				if(l->scope_lev==0) fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(ac),l->name);
-				else emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
+				if(l->scope_lev==0){ 
+					fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(t2),l->name);
+					emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
+					break;
+				}
+				else {
+						
+					if(l->vpf==Para){
+						emitRRM("addi",getRegisterName(t2),getRegisterName(fp),(l->local_loc),"not yet implemented");
+						emitRMR("lw",getRegisterName(t2),0,getRegisterName(t2),NULL);
+						emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
+					}
+					else{
+						emitRRM("addi",getRegisterName(t2),getRegisterName(fp),l->local_loc-4,"not yet implemented");
+						if(call_flag)
+							emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
+					}
+						break;
+				}
 			}
 			else{	// if it is variable (not array)
 				if(l->scope_lev==0) 
-					fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(ac),l->name);
+					fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(t2),l->name);
 				else{
-			//		fprintf(code,"%s memloc %d para_num %d\n",tree->attr.name,l->memloc,old_para_num);
+			//	fprintf(code,"%s memloc %d para_num %d\n",tree->attr.name,l->memloc,l->local_loc);
 					if(l->vpf==Var)
-						emitRRM("addi",getRegisterName(t2),getRegisterName(fp),(l->memloc+1-old_para_num)*-4-4,"not yet implemented");	// minus control link
-					else if(l->vpf == Para)
-						emitRRM("addi",getRegisterName(t2),getRegisterName(fp),(l->memloc+1)*4,"not yet implemented");
+						emitRRM("addi",getRegisterName(t2),getRegisterName(fp),l->local_loc-4,NULL);	// minus control link
+					else if(l->vpf == Para){
+						emitRRM("addi",getRegisterName(t2),getRegisterName(fp),l->local_loc,NULL);
+
+					}
 				}	
 			
 			}
 			/////////////////////////////////////////// not yet implemented ////////////////////////////////////////
 
 
+			if(assign_flag)
+				emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
 
-			if(!assign_flag){		//if it is not assign statement, get the value of id				
+			else{		//if it is not assign statement, get the value of id				
 				emitRMR("lw",getRegisterName(ac),0,getRegisterName(t2),NULL);
 
 			}
-			else								// in case of assignment, move address to t1
-				emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
-
+			//else{								// in case of assignment, move address to t1
+			//	emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
+			//}
 			if (TraceCode)  emitComment("<- Id") ;
 			break; /* IdK */
 
@@ -243,6 +266,7 @@ static void genExp( TreeNode * tree)
 			}
 
 			switch (tree->attr.op) {
+				temp_assign=0;
 				case PLUS :
 					emitRRR("add",getRegisterName(ac),getRegisterName(t2),getRegisterName(ac),"op +");
 					break;
@@ -292,6 +316,13 @@ static void genExp( TreeNode * tree)
 
 					assign_flag=1;				
 					cGen(p1);		// left hand side
+					/*if(p1->child[0]){
+						cGen(p1->child[0]);
+						assign_flag=1;
+					}
+					else 
+						assign_flag=1;
+					cGen(p1);*/
 					pop(t2);
 
 
@@ -314,27 +345,45 @@ static void genExp( TreeNode * tree)
 		case ArrK: 
 			if (TraceCode) 
 				emitComment("-> Array") ;
+
+			temp_assign=assign_flag;
+			assign_flag=0;
+
 			p1=tree->child[0];
 
 			if(p1)	//[exp]
 				cGen(p1);
 
-
+			assign_flag=temp_assign;
 
 			///////////////////////////////// not implemented /////////////////////////////////////////////
 			l = tree->bl;
 
+	//		if(l->vpf==Para)
+		//	fprintf(code,"--------------         %d\n",call_flag);
+			//fprintf(code,"   %d %d",tree->lineno,l->local_loc);
 			if(l->scope_lev == 0)
 				 fprintf(code,"\t%5s  $%s,%s\n","la",getRegisterName(t2),l->name);	
 				//fprintf(code,"\tlda t2, name\n");
-			else
-				emitRRM("addi",getRegisterName(t2),getRegisterName(fp),-20,NULL);
+			else{
+				if(l->vpf==Para){
+					emitRRM("addi",getRegisterName(t2),getRegisterName(fp),l->local_loc,NULL);
+					emitRMR("lw",getRegisterName(t2),0,getRegisterName(t2),NULL);
+				}
+				else{ 
+					emitRRM("addi",getRegisterName(t2),getRegisterName(fp),l->local_loc-4,NULL);
+					//if(call_flag)
+					//	emitRR("move",getRegisterName(ac),getRegisterName(t2),NULL);
+				}
+				
+				//eitRMR("lw",getRegisterName(t2),0,getRegisterName(t2),NULL);
+			}
 			///////////////////////////////// not implemented /////////////////////////////////////////////
 
 
 			emitRM("li",getRegisterName(t3),4,NULL);		// get type size(int) of array to register t3
 			emitRRR("mul",getRegisterName(t3),getRegisterName(ac),getRegisterName(t3),NULL);		// 4*exp
-			emitRRR("addi",getRegisterName(ac),getRegisterName(t2),getRegisterName(t3),NULL);	// &array + 4*exp
+			emitRRR("add",getRegisterName(ac),getRegisterName(t2),getRegisterName(t3),NULL);	// &array + 4*exp
 
 			if(p1 && !assign_flag)	// if it is not assign statement, get the value
 			{
@@ -352,9 +401,8 @@ static void genExp( TreeNode * tree)
 			
 			TreeNode* temp = tree->child[0];
 
-			old_para_num=new_para_num;
+			//old_para_num=new_para_num;
 			new_para_num=0;
-			//nt temp_para_num=0;
 			while(temp){			// count the number of parameters
 				new_para_num++;
 				temp=temp->sibling;
@@ -459,7 +507,6 @@ static void cGen( TreeNode * tree)
 { if (tree != NULL)
 	{ 
 		//		if(tree->attr.name)
-		//fprintf(code,"--%d\n",tree->lineno);
 
 		switch (tree->nodekind) 
 		{

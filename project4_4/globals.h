@@ -123,7 +123,7 @@ typedef struct treeNode
 	 int local_loc;
      DclrExpType type; /* for type checking of exps and dclrs */
    	
-		BucketList bl;
+	 BucketList bl;
 	} TreeNode;
 
 /**************************************************/

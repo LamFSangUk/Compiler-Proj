@@ -72,7 +72,7 @@ void st_insert( TreeNode * tnode, int loc ,int mode)
 			l->arrsize=tnode->size;
 			l->type=tnode->type;
 			l->memloc = loc;
-			l->local_loc=tnode->local_loc*-1;
+			l->local_loc=tnode->local_loc;
 			l->scope_lev=st->scope_lev;
 			l->lines->next = NULL;
 			l->next = st->hashTable[h];
@@ -141,7 +141,6 @@ BucketList st_lookup ( char * name, int mode)
     		l = l->next;
   		if (l == NULL) {
 			if(mode==0) {
-				printf("mode????\n");
 				return NULL;//No exist in cur scope. Err
 			}
 			else 

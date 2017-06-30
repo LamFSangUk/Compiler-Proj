@@ -1,7 +1,7 @@
 C = gcc
 CFLAG = 
 OBJECTS = main.o util.o lex.yy.o cminus.tab.o symtab.o analyze.o code.o cgen.o
-TARGET = project3_4
+TARGET = project4_4
 
 all : $(TARGET)
 
